@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>03-sqlite</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>04-webscraping</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7517,7 +7517,7 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1><center>ECON 725: Computer Programming and Data Management in Economics <a class="tocSkip"></a></center></h1>
-<h1><center>Python - Introduction to SQLite  <a class="tocSkip"></a></center></h1>
+<h1><center>Python - Web scraping <a class="tocSkip"></a></center></h1>
 </div>
 </div>
 </div>
@@ -7530,13 +7530,9 @@ a.anchor-link {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Learning-Objectives">Learning Objectives<a class="anchor-link" href="#Learning-Objectives">¶</a></h2><hr/>
 <ul>
-<li>Understand the basics of SQL Lite</li>
-<li>Learn how to connect to a SQL Lite database</li>
-<li>Learn how to create tables in a SQL Lite database</li>
-<li>Learn how to insert data into a SQL Lite database</li>
-<li>Learn how to query data from a SQL Lite database</li>
-<li>Learn how to update data in a SQL Lite database</li>
-<li>Learn how to delete data from a SQL Lite database</li>
+<li>Understand the basics of web scraping</li>
+<li>Learn how to use the <code>MechanicalSoup</code> library to scrape web pages.</li>
+<li>Learn how to scrape data from a website using forms, and pagination.</li>
 </ul>
 </div>
 </div>
@@ -7548,26 +7544,164 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">¶</a></h2><hr/>
-<p>When you load a CSV file in Python and assign it to a variable, it consumes your computer's memory. Accessing data from a SQL database is more efficient and enables you to import only the necessary portions of the data.</p>
-<p>In this lesson, we will explore some methods to achieve this. This is our first introduction to SQL databases. We will use the SQLite database, which is a lightweight database that is easy to set up and use. SQLite is a self-contained, serverless, zero-configuration, transactional SQL database engine. It is the most widely deployed database in the world with applications in many devices and operating systems.</p>
-<h3 id="What-is-SQL?">What is SQL?<a class="anchor-link" href="#What-is-SQL?">¶</a></h3><p>SQL stands for Structured Query Language. It is a standard language for storing, manipulating, and retrieving data in databases. SQL is used to communicate with a database. According to ANSI (American National Standards Institute), it is the standard language for relational database management systems. SQL statements are used to perform tasks such as update data on a database, or retrieve data from a database. This is our first introduction to SQL databases. We are going to explore more about this topic throughout the course as we progress.</p>
-<h3 id="The-sqlite3-module">The sqlite3 module<a class="anchor-link" href="#The-sqlite3-module">¶</a></h3><p>The <a href="https://docs.python.org/3/library/sqlite3.html">sqlite3</a> module provides a straightforward interface for interacting with SQLite databases. A connection object is created using <code>sqlite3.connect()</code>; the connection must be closed at the end of the session with the <code>.close()</code> command. While the connection is open, any interactions with the database require you to make a cursor object with the <code>.cursor()</code> command. The cursor is then ready to perform all kinds of operations with <code>.execute()</code>.</p>
+<h1 id="Web-scraping-Basics">Web scraping Basics<a class="anchor-link" href="#Web-scraping-Basics">¶</a></h1><p>This lecture is about on how to get "cheap" data, off the web and onto our computer. This is a very useful skill to have, as it allows us to collect data that is not available in a downloadable format.</p>
+<p>Web scraping is the process of extracting information from websites. It simulates the human browsing behavior to extract information from websites. The information is then converted into a structured format that can be further analyzed and stored in a database. There are two ways that web content gets rendered in a browser:</p>
+<ol>
+<li>Server-side rendering: The server sends the HTML content to the browser, which then renders the content.</li>
+<li>Client-side rendering: The server sends a minimal HTML content to the browser, which then executes JavaScript code to render the content.</li>
+</ol>
+<p>You can read <a href="https://www.codeconquest.com/website/client-side-vs-server-side/">here</a> for more details (incluiding example scripts), but for the purposed of this lecture, we will focus on the following:</p>
+<h3 id="Server-side-rendering">Server-side rendering<a class="anchor-link" href="#Server-side-rendering">¶</a></h3><ul>
+<li>The scripts that “build” the website are not run on our computer, but rather on a host server that sends down all of the HTML code.
+E.g. Wikipedia tables are already populated with all of the information — numbers, dates, etc. — that we see in our browser.</li>
+<li>In other words, the information that we see in our browser has already been processed by the host server.</li>
+<li>You can think of this information being embeded directly in the webpage’s HTML.</li>
+<li><strong>Webscraping challenges</strong>: Finding the correct CSS (or Xpath) “selectors”. Iterating through dynamic webpages (e.g. “Next page” and “Show More” tabs).</li>
+<li>Key concepts: CSS, Xpath, HTML</li>
+</ul>
+<h3 id="Client-side-rendering">Client-side rendering<a class="anchor-link" href="#Client-side-rendering">¶</a></h3><ul>
+<li>The website contains an empty template of HTML and CSS.
+E.g. It might contain a “skeleton” table without any values.</li>
+<li>However, when we actually visit the page URL, our browser sends a request to the host server.</li>
+<li>If everything is okay (e.g. our request is valid), then the server sends a response script, which our browser executes and uses to populate the HTML template with the specific information that we want.</li>
+<li><strong>Webscraping challenges</strong>: Finding the “API endpoints” can be tricky, since these are sometimes hidden from view.</li>
+<li>Key concepts: APIs, API endpoints</li>
+</ul>
+<p>Over this lecture, we'll go over the server-side rendering, which is the most common type of rendering. However, I want to forewarn you that webscraping typically involves a fair bit of detective work.</p>
+<p>You will often have to adjust your steps according to the type of data you want, and the steps that worked on one website may not work on another. (Or even work on the same website a few months later).</p>
+<p><strong>All this is to say that webscraping involves as much art as it does science.</strong></p>
+<p>The good news is that both server-side and client-side websites allow for webscraping.1 If you can see it in your browser, you can scrape it!</p>
+<h3 id="Caveat:-Ethical-and-legal-considerations">Caveat: Ethical and legal considerations<a class="anchor-link" href="#Caveat:-Ethical-and-legal-considerations">¶</a></h3><p>TLDR; Just because you can scrape it, doesn’t mean you should.</p>
+<p>It is currently legal (read more <a href="https://en.wikipedia.org/wiki/HiQ_Labs_v._LinkedIn">here</a>) to scrape public websites, but there are some important caveats to keep in mind: it’s still important to realise that the tools we’ll be using over these next two lectures are very powerful. A computer can process commands much, much faster than we can ever type them up manually. It’s pretty easy to write up a function or program that can overwhelm a host server or application through the sheer weight of requests. Or, just as likely, the host server has built-in safeguards that will block you in case of a suspected malicious attack. So, be careful and nice when scraping websites 🙂.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sqlite3</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h1 id="MechanicalSoup">MechanicalSoup<a class="anchor-link" href="#MechanicalSoup">¶</a></h1><h3 id="What-is-MechanicalSoup?">What is MechanicalSoup?<a class="anchor-link" href="#What-is-MechanicalSoup?">¶</a></h3><p><a href="https://mechanicalsoup.readthedocs.io/en/stable/">MechanicalSoup</a> is a Python browser automation library built on top of <code>Requests</code> (for making HTTP requests) and <code>BeautifulSoup</code> (for parsing HTML). It acts as a headless browser, mimicking a browser's behavior without the need for a graphical user interface. This makes it lightweight and efficient compared to full-fledged browser automation tools.</p>
+<p>Here a simple example of using <code>MechanicalSoup</code> to open a webpage, print its title, and close the browser session:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mechanicalsoup</span>
+
+<span class="n">browser</span> <span class="o">=</span> <span class="n">mechanicalsoup</span><span class="o">.</span><span class="n">StatefulBrowser</span><span class="p">()</span>
+<span class="n">browser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"https://example.com"</span><span class="p">)</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">get_current_page</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Why-use-MechanicalSoup-for-web-scraping?">Why use MechanicalSoup for web scraping?<a class="anchor-link" href="#Why-use-MechanicalSoup-for-web-scraping?">¶</a></h3><p><code>MechanicalSoup</code> provides some features that make it a valuable tool for web scraping:</p>
+<ul>
+<li>Navigation</li>
+<li>Form handling</li>
+<li>Session management</li>
+</ul>
+<h4 id="Navigation">Navigation<a class="anchor-link" href="#Navigation">¶</a></h4><div class="highlight"><pre><span></span><span class="c1"># Follow a link by its text</span>
+<span class="n">browser</span><span class="o">.</span><span class="n">follow_link</span><span class="p">(</span><span class="s2">"Login"</span><span class="p">)</span>
+
+<span class="c1"># Follow a link by its URL</span>
+<span class="n">browser</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="s2">"https://example.com/next_page"</span><span class="p">)</span>
+</pre></div>
+<h4 id="Form-handling">Form handling<a class="anchor-link" href="#Form-handling">¶</a></h4><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mechanicalsoup</span> <span class="kn">import</span> <span class="n">Browser</span>
+
+<span class="c1"># Replace with the login URL you want</span>
+<span class="n">browser</span> <span class="o">=</span> <span class="n">Browser</span><span class="p">()</span>
+<span class="n">browser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"https://old.reddit.com"</span><span class="p">)</span>  <span class="c1"># Example login form</span>
+
+<span class="c1"># Find the login form</span>
+<span class="n">login_form</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">select_form</span><span class="p">(</span><span class="s1">'form'</span><span class="p">)</span>  <span class="c1"># Replace with specific form identifier if needed</span>
+
+<span class="c1"># Fill the form fields</span>
+<span class="n">login_form</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"your_username"</span>
+<span class="n">login_form</span><span class="p">[</span><span class="s2">"password"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"your_password"</span>
+
+<span class="c1"># Submit the form</span>
+<span class="n">browser</span><span class="o">.</span><span class="n">submit_selected</span><span class="p">()</span>
+
+<span class="c1"># Access the response data (assuming successful login)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">soup</span>
+<span class="n">content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"pre"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>  <span class="c1"># This should print the form data submitted</span>
+</pre></div>
+<h4 id="Session-management">Session management<a class="anchor-link" href="#Session-management">¶</a></h4><p><code>MechanicalSoup</code> automatically manages cookies and other session information:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Access data from a protected page after login (session is maintained)</span>
+<span class="n">content</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"div"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"protected_content"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><code>MechanicalSoup</code> is a powerful tool for web scraping, but it is not the only one. Other popular libraries include <code>Scrapy</code>, <code>Selenium</code>, and <code>BeautifulSoup</code>. Each has its own strengths and weaknesses, so it's important to choose the right tool for the job.</p>
+<h4 id="MechanicalSoup-vs.-BeautifulSoup">MechanicalSoup vs. BeautifulSoup<a class="anchor-link" href="#MechanicalSoup-vs.-BeautifulSoup">¶</a></h4><p>While both libraries are used for web scraping, <code>MechanicalSoup</code> and <code>BeautifulSoup</code> have distinct functionalities:</p>
+<ul>
+<li><code>BeautifulSoup</code>: This library specializes in parsing HTML content. It excels at identifying and extracting data from downloaded HTML code. However, it doesn't handle tasks like form submission, navigation, or session management.</li>
+<li><code>MechanicalSoup</code>: Built on top of <code>BeautifulSoup</code>, <code>MechanicalSoup</code> adds form handling, navigation, and session management functionalities. It allows you to interact with websites more dynamically by mimicking user behavior.
+If you simply need to extract data from downloaded HTML content, <code>BeautifulSoup</code> is sufficient.</li>
+</ul>
+<p>If your scraping task involves interacting with forms, navigating through pages, or maintaining sessions, <code>MechanicalSoup</code> is the better choice.</p>
+<h4 id="MechanicalSoup-vs.-Selenium">MechanicalSoup vs. Selenium<a class="anchor-link" href="#MechanicalSoup-vs.-Selenium">¶</a></h4><p>Another popular library for web scraping is <code>Selenium</code>, as it provides full-fledged browser automation. Here's a breakdown of the key differences between <code>Selenium</code> and <code>MechanicalSoup</code>:</p>
+<ul>
+<li><p>Functionality</p>
+<ul>
+<li><code>Selenium</code> can handle complex JavaScript, render pages with dynamic content, and automate browser interactions beyond scraping.</li>
+<li><code>MechanicalSoup</code> focuses on scraping tasks and doesn't mimic advanced browser behavior.</li>
+</ul>
+</li>
+<li><p>Complexity</p>
+<ul>
+<li><code>Selenium</code> has a steeper learning curve due to its comprehensive functionality.</li>
+<li><code>MechanicalSoup</code> offers a simpler API, which makes it easier to learn and use for basic scraping tasks.</li>
+</ul>
+</li>
+<li><p>Performance</p>
+<ul>
+<li><code>Selenium</code> is slower, and so may require more processing power due to its browser emulation capabilities.</li>
+<li><code>MechanicalSoup</code> is generally faster for simpler tasks as it doesn't involve full browser rendering.</li>
+</ul>
+</li>
+</ul>
+<p>If you need to handle advanced JavaScript or mimic complex browser interactions, <code>Selenium</code> is the way to go.</p>
+<p>For most basic scraping tasks, especially for static websites and those with straightforward forms and navigation, <code>MechanicalSoup</code> is a more efficient and lightweight option.</p>
+<hr/>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Getting-Started-with-MechanicalSoup">Getting Started with MechanicalSoup<a class="anchor-link" href="#Getting-Started-with-MechanicalSoup">¶</a></h3><br/>
+<center>
+<div>
+<img alt="No description has been provided for this image" src="https://raw.githack.com/DataSciEcon-Emory/fall2025/main/images/mechanical_soup.png" width="400"/>
+</div>
+</center>
+<p>This topic material is based on the <a href="https://www.scrapingbee.com/blog/getting-started-with-mechanicalsoup/">scrapingbee.com</a> blog and adapted for our purposes in the course.</p>
+<p>Let's start with a simple example on how to extract the title and the reference links of a webpage using <code>MechanicalSoup</code> using this link from <a href="https://en.wikipedia.org/wiki/Web_scraping">Wikipedia</a>. Of course, there's a lot of information that you can scrape from a Wikipedia page, but extracting just the title and the reference links should help you understand how to find HTML tags and how to extract data from deep within the HTML hierarchy of a page.</p>
 </div>
 </div>
 </div>
@@ -7579,75 +7713,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># create empty database</span>
-<span class="n">connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"gta.db"</span><span class="p">)</span>
-<span class="c1"># communicate with the database</span>
-<span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># data to be inserted into the database</span>
-<span class="n">release_list</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="mi">1997</span><span class="p">,</span> <span class="s2">"Grand Theft Auto"</span><span class="p">,</span> <span class="s2">"state of New Guernsey"</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">1999</span><span class="p">,</span> <span class="s2">"Grand Theft Auto 2"</span><span class="p">,</span> <span class="s2">"Anywhere, USA"</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">2001</span><span class="p">,</span> <span class="s2">"Grand Theft Auto III"</span><span class="p">,</span> <span class="s2">"Liberty City"</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">2002</span><span class="p">,</span> <span class="s2">"Grand Theft Auto: Vice City"</span><span class="p">,</span> <span class="s2">"Vice City"</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">2004</span><span class="p">,</span> <span class="s2">"Grand Theft Auto: San Andreas"</span><span class="p">,</span> <span class="s2">"state of San Andreas"</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">2008</span><span class="p">,</span> <span class="s2">"Grand Theft Auto IV"</span><span class="p">,</span> <span class="s2">"Liberty City"</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">2013</span><span class="p">,</span> <span class="s2">"Grand Theft Auto V"</span><span class="p">,</span> <span class="s2">"Los Santos"</span><span class="p">)</span>
-<span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">city_list</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s2">"Liberty City"</span><span class="p">,</span> <span class="s2">"New York"</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">"state of New Guernsey"</span><span class="p">,</span> <span class="s2">"state of New Jersey"</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">"Anywhere, USA"</span><span class="p">,</span> <span class="s2">"all USA cities"</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">"Vice City"</span><span class="p">,</span> <span class="s2">"Miami"</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">"state of San Andreas"</span><span class="p">,</span> <span class="s2">"state of California"</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">"Los Santos"</span><span class="p">,</span> <span class="s2">"Los Angeles"</span><span class="p">)</span>
-<span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Drop the table (replace 'table_name' with actual table name)</span>
-<span class="c1"># cursor.execute("DROP TABLE IF EXISTS gta")</span>
-
-<span class="c1"># create database table and populate it with release_list</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"create table gta (release_year integer, release_name text, city text)"</span><span class="p">)</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s2">"insert into gta values (?,?,?)"</span><span class="p">,</span> <span class="n">release_list</span><span class="p">)</span>
-<span class="c1"># save changes immediatley</span>
-<span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">mechanicalsoup</span>
 </pre></div>
 </div>
 </div>
@@ -7658,12 +7724,54 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># print all the rows from the gta table</span>
-<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select * from gta"</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Connect to the website</span>
+<span class="n">browser</span> <span class="o">=</span> <span class="n">mechanicalsoup</span><span class="o">.</span><span class="n">StatefulBrowser</span><span class="p">()</span>  
+<span class="n">browser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"https://en.wikipedia.org/wiki/Web_scraping"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>&lt;Response [200]&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h5 id="Extracting-the-title">Extracting the title<a class="anchor-link" href="#Extracting-the-title">¶</a></h5><p>To extract the title, you first need to understand the structure of the Wikipedia page. Open the page in Google Chrome and press <code>F12</code> to open the developer tools. In the <code>Elements</code> tab, look for the HTML tag for the title of the page. Here's what it will look like:</p>
+<div>
+<img alt="No description has been provided for this image" src="https://www.scrapingbee.com/blog/getting-started-with-mechanicalsoup/page-title-html_hu17009774656312328514.png" width="600"/>
+</div>
+<p>To get the title from the page, look for a <code>span</code> tag that has the class <code>mw-page-title-main</code></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">title</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'span.mw-page-title-main'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"title: "</span> <span class="o">+</span> <span class="n">title</span><span class="o">.</span><span class="n">string</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7676,15 +7784,185 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>(1997, 'Grand Theft Auto', 'state of New Guernsey')
-(1999, 'Grand Theft Auto 2', 'Anywhere, USA')
-(2001, 'Grand Theft Auto III', 'Liberty City')
-(2002, 'Grand Theft Auto: Vice City', 'Vice City')
-(2004, 'Grand Theft Auto: San Andreas', 'state of San Andreas')
-(2008, 'Grand Theft Auto IV', 'Liberty City')
-(2013, 'Grand Theft Auto V', 'Los Santos')
+<pre>title: Web scraping
 </pre>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Extracting-the-reference-links">Extracting the reference links<a class="anchor-link" href="#Extracting-the-reference-links">¶</a></h4><p>Next, you'll find and extract all the links from the references section of the web page. First, take a quick peek at the HTML structure of the References section by inspecting it with your browser's developer tools:</p>
+<div>
+<img alt="No description has been provided for this image" src="https://www.scrapingbee.com/blog/getting-started-with-mechanicalsoup/references-structure_hu4756474786081050296.png" width="1000"/>
+</div>
+<p>First, select the ordered list (<code>ol</code>) tag that has the class references. With that tag selected, you can consider using the method <code>find_all</code> method to extract all links inside this <code>ol</code> tag. However, on a closer look, you'll find that this section also contains backlinks to places in the same Wikipedia page where each reference was cited:</p>
+<div>
+<img alt="No description has been provided for this image" src="https://www.scrapingbee.com/blog/getting-started-with-mechanicalsoup/backlinks_hu8625713131764143085.png" width="1000"/>
+</div>
+<p>If you extract all links from this tag using the <code>find_all</code> function, the results will contain same-page backlinks too, which you don't need. To avoid that, you need to select all <code>reference-text</code> span tags and extract the links from them.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Select the **References section**</span>
+<span class="n">references</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'ol.references'</span><span class="p">)</span>
+
+<span class="c1"># Select all span tags with the class `reference-text` to exclude backlinks</span>
+<span class="n">references_list</span> <span class="o">=</span> <span class="n">references</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'span.reference-text'</span><span class="p">)</span>
+
+<span class="c1"># For each reference span tag, find all anchor elements and print their href attribute values</span>
+<span class="k">for</span> <span class="n">reference</span> <span class="ow">in</span> <span class="n">references_list</span><span class="p">:</span>
+    <span class="n">link_tags</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">"a"</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">link_tag</span> <span class="ow">in</span> <span class="n">link_tags</span><span class="p">:</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">link_tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"href"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">link</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>https://doi.org/10.5334%2Fdsj-2021-024
+/wiki/Doi_(identifier)
+https://doi.org/10.5334%2Fdsj-2021-024
+/wiki/ISSN_(identifier)
+https://search.worldcat.org/issn/1683-1470
+/wiki/S2CID_(identifier)
+https://api.semanticscholar.org/CorpusID:237719804
+http://www.searchenginehistory.com/
+https://web.archive.org/web/20161011080619/https://pdfs.semanticscholar.org/4fb4/3c5a212df751e84c3b2f8d29fabfe56c3616.pdf
+/wiki/Doi_(identifier)
+https://doi.org/10.1145%2F1281192.1281287
+/wiki/ISBN_(identifier)
+/wiki/Special:BookSources/9781595936097
+/wiki/S2CID_(identifier)
+https://api.semanticscholar.org/CorpusID:833565
+https://pdfs.semanticscholar.org/4fb4/3c5a212df751e84c3b2f8d29fabfe56c3616.pdf
+http://www.gooseeker.com/en/node/knowledgebase/freeformat
+http://www.xconomy.com/san-francisco/2012/07/25/diffbot-is-using-computer-vision-to-reinvent-the-semantic-web/
+https://doi.org/10.1016%2Fj.jbusres.2020.06.012
+/wiki/Doi_(identifier)
+https://doi.org/10.1016%2Fj.jbusres.2020.06.012
+/wiki/ISSN_(identifier)
+https://search.worldcat.org/issn/0148-2963
+https://web.archive.org/web/20020308222536/http://www.chillingeffects.org/linking/faq.cgi#QID596
+http://www.chillingeffects.org/linking/faq.cgi#QID596
+http://scholarship.law.berkeley.edu/btlj/vol29/iss4/16/
+/wiki/Doi_(identifier)
+https://doi.org/10.15779%2FZ38B39B
+/wiki/ISSN_(identifier)
+https://search.worldcat.org/issn/1086-3818
+/wiki/Template:Cite_journal
+/wiki/Category:CS1_maint:_multiple_names:_authors_list
+http://www.tomwbell.com/NetLaw/Ch06.html
+https://web.archive.org/web/20020308222536/http://www.chillingeffects.org/linking/faq.cgi#QID460
+http://www.chillingeffects.org/linking/faq.cgi#QID460
+http://www.tomwbell.com/NetLaw/Ch07/Ticketmaster.html
+https://web.archive.org/web/20110723131832/http://www.fornova.net/documents/AAFareChase.pdf
+http://www.fornova.net/documents/AAFareChase.pdf
+https://web.archive.org/web/20160305025808/http://www.thefreelibrary.com/American+Airlines,+FareChase+Settle+Suit.-a0103213546
+http://www.thefreelibrary.com/American+Airlines,+FareChase+Settle+Suit.-a0103213546
+http://www.imperva.com/docs/WP_Detecting_and_Blocking_Site_Scraping_Attacks.pdf
+https://web.archive.org/web/20110211123854/http://library.findlaw.com/2003/Jul/29/132944.html
+http://library.findlaw.com/2003/Jul/29/132944.html
+https://web.archive.org/web/20130921054619/http://www.fornova.net/documents/Cvent.pdf
+http://www.fornova.net/documents/Cvent.pdf
+https://www.scribd.com/doc/249068700/LinkedIn-v-Resultly-LLC-Complaint?secret_password=pEVKDbnvhQL52oKfdrmT
+http://newmedialaw.proskauer.com/2014/12/05/qvc-sues-shopping-app-for-web-scraping-that-allegedly-triggered-site-outage/
+https://web.archive.org/web/20110723132015/http://www.fornova.net/documents/pblog-bna-com.pdf
+http://www.fornova.net/documents/pblog-bna-com.pdf
+https://www.techdirt.com/articles/20090605/2228205147.shtml
+https://www.eff.org/cases/facebook-v-power-ventures
+https://www.reuters.com/technology/us-supreme-court-revives-linkedin-bid-shield-personal-data-2021-06-14/
+/wiki/Reuters
+https://techcrunch.com/2022/04/18/web-scraping-legal-court/
+https://web.archive.org/web/20071012005033/http://www.bvhd.dk/uploads/tx_mocarticles/S_-_og_Handelsrettens_afg_relse_i_Ofir-sagen.pdf
+http://www.bvhd.dk/uploads/tx_mocarticles/S_-_og_Handelsrettens_afg_relse_i_Ofir-sagen.pdf
+http://www.bailii.org/ie/cases/IEHC/2010/H47.html
+https://web.archive.org/web/20120624103316/http://www.lkshields.ie/htmdocs/publications/newsletters/update26/update26_03.htm
+http://www.lkshields.ie/htmdocs/publications/newsletters/update26/update26_03.htm
+https://www.cnil.fr/fr/la-reutilisation-des-donnees-publiquement-accessibles-en-ligne-des-fins-de-demarchage-commercial
+https://medium.com/@finddatalab/can-you-still-perform-web-scraping-with-the-new-cnil-guidelines-bf3e20d0edc2
+https://web.archive.org/web/20191203113701/https://www.lloyds.com/~/media/5880dae185914b2487bed7bd63b96286.ashx
+https://www.lloyds.com/~/media/5880dae185914b2487bed7bd63b96286.ashx
+http://www.webstartdesign.com.au/spam_business_practical_guide.pdf
+https://proxyway.com/guides/what-is-web-scraping
+https://s3.us-west-2.amazonaws.com/research-papers-mynk/Breaking-Fraud-And-Bot-Detection-Solutions.pdf
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Advanced-Web-Scraping-with-MechanicalSoup">Advanced Web Scraping with MechanicalSoup<a class="anchor-link" href="#Advanced-Web-Scraping-with-MechanicalSoup">¶</a></h3><p>Now that you know how to scrape simple websites with <code>MechanicalSoup</code>, you can learn how to use it to scrape dynamic multipage websites. In this section, you'll scrape a sandbox called <a href="https://www.scrapethissite.com/">Scrape This Site</a> . First, navigate to its home page:</p>
+<p>To navigate through web pages, you can use MechanicalSoup's <code>follow_link</code> function. You'll need to provide it with the target link that you want to navigate to, so locate and select the appropriate anchor tags on each page and extract their <code>href</code> attribute values.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">browser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"https://www.scrapethissite.com/"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>https://www.scrapethissite.com/
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Next, find the link to the sandbox page from the navigation bar. If you inspect the page, you'll find that the link is inside an <code>&lt;li&gt;</code> tag that has the <code>id</code> as <code>nav-sandbox</code>. You can use the following code to extract and follow the link from this tag:</p>
 </div>
 </div>
 </div>
@@ -7696,11 +7974,13 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># print specific rows from the gta table</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"******************************"</span><span class="p">)</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select * from gta where city=:c"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"c"</span><span class="p">:</span> <span class="s2">"Liberty City"</span><span class="p">})</span>
-<span class="n">gta_search</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">gta_search</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">sandbox_nav_link</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'li#nav-sandbox'</span><span class="p">)</span>
+
+<span class="n">sandbox_link</span> <span class="o">=</span> <span class="n">sandbox_nav_link</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+
+<span class="n">browser</span><span class="o">.</span><span class="n">follow_link</span><span class="p">(</span><span class="n">sandbox_link</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7713,51 +7993,54 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>******************************
-[(2001, 'Grand Theft Auto III', 'Liberty City'), (2008, 'Grand Theft Auto IV', 'Liberty City')]
+<pre>https://www.scrapethissite.com/pages/
 </pre>
 </div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Next, locate and follow the <strong>Hockey Teams: Forms, Searching and Pagination</strong> link. If you inspect the HTML structure around this element, you'll notice that each link on this page is inside <code>&lt;div class="page"&gt;</code> tags.</p>
+<div>
+<img alt="No description has been provided for this image" src="https://www.scrapingbee.com/blog/getting-started-with-mechanicalsoup/inspect-sandbox-page_hu8403476182413272040.png" width="1000"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>You can extract all these <code>divs</code> first, select the second <code>div</code>, and then select and extract the link from the <code>a</code> tag from within it. Here's the code you can use to do that:</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">gta_search</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>list</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># print the columns of the gta table</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"PRAGMA table_info(gta)"</span><span class="p">)</span> <span class="c1"># special command that retrieves metadata about the columns of a table</span>
-<span class="n">columns</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">sandbox_list_items</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'div.page'</span><span class="p">)</span>
+
+<span class="n">hockey_list_item</span> <span class="o">=</span> <span class="n">sandbox_list_items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">forms_sandbox_link</span> <span class="o">=</span> <span class="n">hockey_list_item</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+
+<span class="n">browser</span><span class="o">.</span><span class="n">follow_link</span><span class="p">(</span><span class="n">forms_sandbox_link</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7770,9 +8053,20 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[(0, 'release_year', 'INTEGER', 0, None, 0), (1, 'release_name', 'TEXT', 0, None, 0), (2, 'city', 'TEXT', 0, None, 0)]
+<pre>https://www.scrapethissite.com/pages/forms/
 </pre>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>This will bring your browser to the hockey teams information page. Putting all together, we can create a function to do the navigation for us:</p>
 </div>
 </div>
 </div>
@@ -7781,51 +8075,32 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># cursor.execute("DROP TABLE IF EXISTS cities")</span>
-
-<span class="c1"># create a new cities table</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"create table cities (gta_city text, real_city text)"</span><span class="p">)</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s2">"insert into cities values (?,?)"</span><span class="p">,</span> <span class="n">city_list</span><span class="p">)</span>
-<span class="c1"># save changes immediatley</span>
-<span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># print all the rows from the gta table</span>
-<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select * from cities"</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">navigate</span><span class="p">():</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"https://www.scrapethissite.com/"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="n">sandbox_nav_link</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'li#nav-sandbox'</span><span class="p">)</span>
+
+    <span class="n">sandbox_link</span> <span class="o">=</span> <span class="n">sandbox_nav_link</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+
+    <span class="n">browser</span><span class="o">.</span><span class="n">follow_link</span><span class="p">(</span><span class="n">sandbox_link</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="n">sandbox_list_items</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'div.page'</span><span class="p">)</span>
+
+    <span class="n">hockey_list_item</span> <span class="o">=</span> <span class="n">sandbox_list_items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">forms_sandbox_link</span> <span class="o">=</span> <span class="n">hockey_list_item</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+
+    <span class="n">browser</span><span class="o">.</span><span class="n">follow_link</span><span class="p">(</span><span class="n">forms_sandbox_link</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>('Liberty City', 'New York')
-('state of New Guernsey', 'state of New Jersey')
-('Anywhere, USA', 'all USA cities')
-('Vice City', 'Miami')
-('state of San Andreas', 'state of California')
-('Los Santos', 'Los Angeles')
-</pre>
 </div>
 </div>
 </div>
@@ -7838,10 +8113,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># select only the rows where gta_city=Liberty City</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select * from cities where gta_city=:c"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"c"</span><span class="p">:</span> <span class="s2">"Liberty City"</span><span class="p">})</span>
-<span class="n">cities_search</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">cities_search</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">navigate</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -7854,13 +8126,29 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[('Liberty City', 'New York')]
+<pre>https://www.scrapethissite.com/
+https://www.scrapethissite.com/pages/
+https://www.scrapethissite.com/pages/forms/
 </pre>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Handling-Forms">Handling Forms<a class="anchor-link" href="#Handling-Forms">¶</a></h4><p>Suppose that we want to extract information of teams that contain the word "new" in their name. To do this, we need to fill the search form with the word "new" and submit it. <code>MechanicalSoup</code> offers a <code>form</code> class to facilitate simpler form handling. You can select a form using its CSS selector and then easily pass input to it according to the names of its input fields.</p>
+<p>MechanicalSoup also provides a simple function called <code>submit_selected()</code> , which allows you to submit a form without having to locate and click its submit button.</p>
+<p>If you inspect the website's structure, you'll notice that the form element has the classes <code>form</code> and <code>form-inline</code>. You can use one of these to identify and select the form. Notice that the input box has been named <code>q</code>. You can use these two details to write the code for handling this page's search form in the <code>handle_form()</code> function. But first, let's write a function to extract the data from a Table.</p>
+<p>To extract the table data from the page, you'll use the <code>select_one</code> and <code>select</code> functions from Beautiful Soup, just as you did earlier in this tutorial. Save the following code in your <code>extract_table_data</code> function:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7868,26 +8156,61 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">gta_search</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">csv</span>
+<span class="k">def</span> <span class="nf">extract_table_data</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+
+    <span class="c1"># Select the table element</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'table'</span><span class="p">)</span>
+
+    <span class="c1"># Open a file and prepare a CSV Writer object</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">csvwriter</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="c1"># Select the headers from the table first</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'th'</span><span class="p">)</span>
+
+    <span class="c1"># Create a temporary array to store the extract table header cells</span>
+    <span class="n">temp_header_row</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># For each header from the headers row, add it to the temporary array</span>
+    <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
+        <span class="n">temp_header_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+
+    <span class="c1"># Write the temporary array to the CSV file</span>
+    <span class="n">csvwriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">temp_header_row</span><span class="p">)</span>
+    
+    <span class="c1"># Next, select all rows of the table</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'tr.team'</span><span class="p">)</span>
+
+    <span class="c1"># For each row, prepare a temporary array containing all extracted cells and append it to the CSV file</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">cells</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'td'</span><span class="p">)</span>
+        <span class="n">temp_row</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">cells</span><span class="p">:</span>
+            <span class="n">temp_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+
+        <span class="n">csvwriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">temp_row</span><span class="p">)</span>
+
+    <span class="c1"># Close the CSV file at the end</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[16]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[(2001, 'Grand Theft Auto III', 'Liberty City'),
- (2008, 'Grand Theft Auto IV', 'Liberty City')]</pre>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Now goin back to the <code>handle_form</code> function, you can use the <code>extract_table_data</code> function to extract the data from the table after submitting the form. Here's the complete code for the <code>handle_form</code> function:</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7895,83 +8218,20 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># combine data from 2 tables and manipulate it</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"***************************************"</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">gta_search</span><span class="p">:</span>
-    <span class="c1">#replace every instance of "Liberty City" with "New York"</span>
-    <span class="n">adjusted</span> <span class="o">=</span> <span class="p">[</span><span class="n">cities_search</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">value</span><span class="o">==</span><span class="n">cities_search</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">adjusted</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">handle_form</span><span class="p">():</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">select_form</span><span class="p">(</span><span class="s1">'form.form-inline'</span><span class="p">)</span>
+
+    <span class="n">browser</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">input</span><span class="p">({</span><span class="s2">"q"</span><span class="p">:</span> <span class="s2">"new"</span><span class="p">})</span>
+
+    <span class="n">browser</span><span class="o">.</span><span class="n">submit_selected</span><span class="p">()</span>
+
+    <span class="n">extract_table_data</span><span class="p">(</span><span class="s2">"first-page-results.csv"</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>***************************************
-[2001, 'Grand Theft Auto III', 'New York']
-[2008, 'Grand Theft Auto IV', 'New York']
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Relational-Databases">Relational Databases<a class="anchor-link" href="#Relational-Databases">¶</a></h2><hr/>
-<ul>
-<li>A relational database organizes its data into <em>tables</em>, sometimes called <em>relations</em>.</li>
-<li>Each table is made up of a fixed number of <em>columns</em> and zero or more <em>rows</em></li>
-<li>Each column has a name, and generally has a data type (SQLite is a bit lenient on data types, but a good database design keeps a uniform type on every row in a column)</li>
-<li>A table usually has a <em>primary key</em>—a column or set of columns that is used to uniquely identify a row. Each row primary key must be unique througout that table.</li>
-</ul>
-<p>So let's get started by importing some data. Let's say we have a CSV file that holds students and their grades in certain courses:</p>
-<pre><code>studentid,course,grade,credits
-1,PY205,3.8,3
-1,PY411,3.2,4
-1,PY412,3.1,4
-1,E101,3.8,2
-1,CS216,3.5,3
-2,PY205,3.1,3
-2,PY411,2.8,4
-2,PY412,2.4,4
-2,E101,2.9,2
-2,CS216,3.3,3
-</code></pre>
-<p>Both students took the same courses. Student 1 did pretty well, student 2 not as well. Grades are assigned a numerical value with A being a 4, B being a 3, etc.</p>
-<p>If this data is in a file called <code>grades.csv</code> then we can import it with the following commands:</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># import grades.csv  in a sqlite database</span>
-
-<span class="c1"># Load the CSV data</span>
-<span class="n">csv_file_path</span> <span class="o">=</span> <span class="s1">'grades.csv'</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_file_path</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7979,122 +8239,39 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">handle_form</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[19]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Handling-Pagination">Handling Pagination<a class="anchor-link" href="#Handling-Pagination">¶</a></h3><p>MechanicalSoup doesn't offer any special methods for handling paginations. You have to select the appropriate link from the pagination element and follow it via your browser object to navigate to the desired page.</p>
+<p>Here's what the HTML structure of the pagination element looks like:</p>
 <div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<th>1</th>
-<td>1</td>
-<td>PY411</td>
-<td>3.2</td>
-<td>4</td>
-</tr>
-<tr>
-<th>2</th>
-<td>1</td>
-<td>PY412</td>
-<td>3.1</td>
-<td>4</td>
-</tr>
-<tr>
-<th>3</th>
-<td>1</td>
-<td>E101</td>
-<td>3.8</td>
-<td>2</td>
-</tr>
-<tr>
-<th>4</th>
-<td>1</td>
-<td>CS216</td>
-<td>3.5</td>
-<td>3</td>
-</tr>
-<tr>
-<th>5</th>
-<td>2</td>
-<td>PY205</td>
-<td>3.1</td>
-<td>3</td>
-</tr>
-<tr>
-<th>6</th>
-<td>2</td>
-<td>PY411</td>
-<td>2.8</td>
-<td>4</td>
-</tr>
-<tr>
-<th>7</th>
-<td>2</td>
-<td>PY412</td>
-<td>2.4</td>
-<td>4</td>
-</tr>
-<tr>
-<th>8</th>
-<td>2</td>
-<td>E101</td>
-<td>2.9</td>
-<td>2</td>
-</tr>
-<tr>
-<th>9</th>
-<td>2</td>
-<td>CS216</td>
-<td>3.3</td>
-<td>3</td>
-</tr>
-</tbody>
-</table>
+<img alt="No description has been provided for this image" src="https://www.scrapingbee.com/blog/getting-started-with-mechanicalsoup/pagination-links-html-structure_hu9569013241349928453.png" width="1000"/>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>First, select the <code>&lt;ul&gt;</code> tag that has the pagination class added to it. Then, find the right <code>&lt;li&gt;</code> tag in it (based on the page number you want to navigate to), and finally, extract the <code>href</code> value from the <code>&lt;a&gt;</code> tag inside the <code>&lt;li&gt;</code> tag you identified. Here's the code to do it:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8102,17 +8279,36 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Connect to SQLite database (or create it if it doesn't exist)</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">'students_grades.db'</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">handle_pagination</span><span class="p">():</span>
+    <span class="n">pagination_links</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'ul.pagination'</span><span class="p">)</span>
 
-<span class="c1"># Save the DataFrame to an SQLite table</span>
-<span class="n">data</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">'grades'</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">if_exists</span><span class="o">=</span><span class="s1">'replace'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">page_links</span> <span class="o">=</span> <span class="n">pagination_links</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'li'</span><span class="p">)</span>
 
-<span class="c1"># Commit and close the connection</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="c1"># Choose the link at index 1 to navigate to page 2</span>
+    <span class="n">next_page</span> <span class="o">=</span> <span class="n">page_links</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Data imported into the SQLite database successfully!"</span><span class="p">)</span>
+    <span class="n">next_page_link</span> <span class="o">=</span> <span class="n">next_page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+
+    <span class="n">browser</span><span class="o">.</span><span class="n">follow_link</span><span class="p">(</span><span class="n">next_page_link</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="c1"># Extract the table data from this page too</span>
+    <span class="n">extract_table_data</span><span class="p">(</span><span class="s1">'second-page-results.csv'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">handle_pagination</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -8125,7 +8321,7 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Data imported into the SQLite database successfully!
+<pre>https://www.scrapethissite.com/pages/forms/?page_num=2&amp;q=new
 </pre>
 </div>
 </div>
@@ -8138,2687 +8334,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Let's start exploring our new database.</p>
-<p>Check out the <a href="https://www.sqlite.org/lang_select.html">SELECT documentation</a> and take a look at the syntax flowchart. It's not important to understand it all now, but keep that flowchart handy as we learn more concepts.</p>
-<p>The important bits to notice are the different clauses:</p>
-<ul>
-<li><strong>SELECT</strong> - lists the columns to return in the results, or <code>*</code> for all columns. These can actually be any expression, which you can use to compute values, as we'll see in a bit.</li>
-<li><strong>FROM</strong> - defines which tables to use as input to the query. If you have more than one table, then the tables are joined. More on joins later.</li>
-<li><strong>WHERE</strong> - Defines conditional expressions that filter the rows from the input tables</li>
-<li><strong>GROUP BY</strong> - Used in aggregate queries. More on this later.</li>
-<li><strong>HAVING</strong> - Expressions used to filter groups on an aggregate query.</li>
-<li><strong>ORDER BY</strong> - Expressions used to sort the results before returning them</li>
-<li><strong>LIMIT</strong> - Places limits or returns a slice of the results.</li>
-</ul>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Install this kernel to use the sqlite3 module</span>
-<span class="c1"># !pip install ipython-sql</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Once installed, you can load the SQL extension and connect it to your SQLite database:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">config</span> SqlMagic.style = '_DEPRECATED_DEFAULT'
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Load the sql extension</span>
-<span class="o">%</span><span class="k">load_ext</span> sql
-
-<span class="c1"># Connect to the SQLite database</span>
-<span class="o">%</span><span class="k">sql</span> sqlite:///students_grades.db
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>The sql extension is already loaded. To reload it, use:
-  %reload_ext sql
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Now, you can write SQL queries directly in the notebook using %sql or %%sql magic commands:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Example 1: Display the first few rows from the grades table</span>
-<span class="o">%</span><span class="k">sql</span> SELECT * FROM grades LIMIT 5;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[26]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>3.2</td>
-<td>4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>3.1</td>
-<td>4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>3.8</td>
-<td>2</td>
-</tr>
-<tr>
-<td>1</td>
-<td>CS216</td>
-<td>3.5</td>
-<td>3</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Example 2: Find all students who have a grade higher than 3.5</span>
-<span class="o">%</span><span class="k">sql</span> SELECT * FROM grades WHERE grade &gt; 3.5;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[27]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>3.8</td>
-<td>2</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>•	Use %sql for a single-line SQL query.</p>
-<p>•	Use %%sql for multi-line queries. Example:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">sql</span>
-<span class="k">SELECT</span><span class="w"> </span><span class="n">course</span><span class="p">,</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">grade</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">avg_grade</span>
-<span class="k">FROM</span><span class="w"> </span><span class="n">grades</span>
-<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">course</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[28]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>course</th>
-<th>avg_grade</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CS216</td>
-<td>3.4</td>
-</tr>
-<tr>
-<td>E101</td>
-<td>3.3499999999999996</td>
-</tr>
-<tr>
-<td>PY205</td>
-<td>3.45</td>
-</tr>
-<tr>
-<td>PY411</td>
-<td>3.0</td>
-</tr>
-<tr>
-<td>PY412</td>
-<td>2.75</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Filtering-rows-with-a-WHERE-clause">Filtering rows with a WHERE clause<a class="anchor-link" href="#Filtering-rows-with-a-WHERE-clause">¶</a></h4><p>You can filter rows using a WHERE clause in your query. You can use simple comparison expressions here. You can have multiple conditions separated by <code>AND</code> and <code>OR</code> keywords.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT * FROM grades WHERE studentid=1;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[29]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>3.2</td>
-<td>4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>3.1</td>
-<td>4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>3.8</td>
-<td>2</td>
-</tr>
-<tr>
-<td>1</td>
-<td>CS216</td>
-<td>3.5</td>
-<td>3</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT * FROM grades WHERE course='PY205';
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[30]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-<td>3.1</td>
-<td>3</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT * FROM grades WHERE studentid=2 AND course='E101';
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[31]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2</td>
-<td>E101</td>
-<td>2.9</td>
-<td>2</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT * FROM grades WHERE grade&gt;3.5;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[32]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>3.8</td>
-<td>2</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Expressions-and-the-SELECT-clause">Expressions and the SELECT clause<a class="anchor-link" href="#Expressions-and-the-SELECT-clause">¶</a></h4><p>You can list specific columns you want in your results in the SELECT clause, seprated by columns. Actually, you can put any expression you want in there, computing results from multiple columns.</p>
-<p>From the <a href="https://www.sqlite.org/lang_select.html#resultset">SQLite documentation</a>:</p>
-<blockquote>
-<p>The list of expressions between the SELECT and FROM keywords is known as the result expression list. If a result expression is the special expression "*" then all columns in the input data are substituted for that one expression.</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid, grade FROM grades;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[33]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>grade</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>3.8</td>
-</tr>
-<tr>
-<td>1</td>
-<td>3.2</td>
-</tr>
-<tr>
-<td>1</td>
-<td>3.1</td>
-</tr>
-<tr>
-<td>1</td>
-<td>3.8</td>
-</tr>
-<tr>
-<td>1</td>
-<td>3.5</td>
-</tr>
-<tr>
-<td>2</td>
-<td>3.1</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2.8</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2.4</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2.9</td>
-</tr>
-<tr>
-<td>2</td>
-<td>3.3</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>This example shows computing a column from an expression. The grade points earned for a course is the grade earned times the credits. This quantity is used in computing grade point averages.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid, course, grade*credits FROM grades;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[34]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade*credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>11.399999999999999</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>12.8</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>12.4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>7.6</td>
-</tr>
-<tr>
-<td>1</td>
-<td>CS216</td>
-<td>10.5</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-<td>9.3</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY411</td>
-<td>11.2</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY412</td>
-<td>9.6</td>
-</tr>
-<tr>
-<td>2</td>
-<td>E101</td>
-<td>5.8</td>
-</tr>
-<tr>
-<td>2</td>
-<td>CS216</td>
-<td>9.899999999999999</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>You can change the result column name by giving an alternative name like so. This is useful for clarity, but also you can refer to these names later in the query in the WHERE clause and a few other clauses.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid, course, grade*credits AS gradepoints FROM grades;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[35]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>gradepoints</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>11.399999999999999</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>12.8</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>12.4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>7.6</td>
-</tr>
-<tr>
-<td>1</td>
-<td>CS216</td>
-<td>10.5</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-<td>9.3</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY411</td>
-<td>11.2</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY412</td>
-<td>9.6</td>
-</tr>
-<tr>
-<td>2</td>
-<td>E101</td>
-<td>5.8</td>
-</tr>
-<tr>
-<td>2</td>
-<td>CS216</td>
-<td>9.899999999999999</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Finally, take a look at the reference page on <a href="https://www.sqlite.org/lang_corefunc.html">Core Functions</a> and the reference page on <a href="https://www.sqlite.org/lang_expr.html">Expressions</a>. The core functions can be used in any expression, and the expression syntax has other features. Here are two examples.</p>
-<p>Using a CASE expression to transform numerical grades to letters:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [36]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">sql</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">studentid</span><span class="p">,</span><span class="w"> </span><span class="n">course</span><span class="p">,</span>
-<span class="w">       </span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">grade</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">.</span><span class="mi">66</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">'F'</span>
-<span class="w">            </span><span class="k">WHEN</span><span class="w"> </span><span class="n">grade</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">.</span><span class="mi">66</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">'D'</span>
-<span class="w">            </span><span class="k">WHEN</span><span class="w"> </span><span class="n">grade</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">.</span><span class="mi">66</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">'C'</span>
-<span class="w">            </span><span class="k">WHEN</span><span class="w"> </span><span class="n">grade</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">.</span><span class="mi">66</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">'B'</span>
-<span class="w">            </span><span class="k">ELSE</span><span class="w"> </span><span class="s1">'A'</span><span class="w"> </span><span class="k">END</span>
-<span class="w">                </span><span class="k">AS</span><span class="w"> </span><span class="n">lettergrade</span>
-<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">grades</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[36]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>lettergrade</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>A</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>B</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>B</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>A</td>
-</tr>
-<tr>
-<td>1</td>
-<td>CS216</td>
-<td>B</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-<td>B</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY411</td>
-<td>B</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY412</td>
-<td>C</td>
-</tr>
-<tr>
-<td>2</td>
-<td>E101</td>
-<td>B</td>
-</tr>
-<tr>
-<td>2</td>
-<td>CS216</td>
-<td>B</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Using a LIKE expression in the WHERE clause to match all Physics classes. LIKE expressions do pattern matching using the percent sign as a wildcard.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT * FROM grades WHERE course LIKE "PY%";
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[37]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>3.2</td>
-<td>4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>3.1</td>
-<td>4</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-<td>3.1</td>
-<td>3</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY411</td>
-<td>2.8</td>
-<td>4</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY412</td>
-<td>2.4</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Now you know how to do simple selects and queries on a table, filtering results and doing some simple computations. Take some time to play with various expressions and queries by your own!</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Grouping-and-Aggregate-Queries">Grouping and Aggregate Queries<a class="anchor-link" href="#Grouping-and-Aggregate-Queries">¶</a></h4><p>So you can now select rows from the table and compute expressions per-row, but what if you want to compute a student's GPA from all their courses? Because each (student,course) pair is its own row, we can't computer a GPA because that involves data from more than one row.</p>
-<p>SQL provides a grouping mechanism that allows you to do aggregate computations on each group. This is done with the GROUP BY clause, which goes after the FROM and WHERE clauses.</p>
-<p>The GROUP BY clause takes one or more expressions, separated by commas, that define the groups. Typically, these expressions will be column names but you can compute values with expressions, too.</p>
-<p>SQL will then take each row and assign it a group based on the GROUP BY expression(s). <strong>The results of the query will be one row per group.</strong> From the <a href="https://www.sqlite.org/lang_select.html#resultset">SQLite docs</a>:</p>
-<blockquote>
-<p>[...] each of the expressions specified as part of the GROUP BY clause is evaluated for each row of the dataset. Each row is then assigned to a "group" based on the results; rows for which the results of evaluating the GROUP BY expressions are the same get assigned to the same group.</p>
-</blockquote>
-<p>Using a GROUP BY clause makes the query into an <em>aggregate query</em>. In your SELECT clause, you can then use one or more <a href="https://www.sqlite.org/lang_aggfunc.html">aggregate functions</a>. The aggregate functions operate over each row in the group. So, for example, you can compute the average grade per student like this:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [38]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid, AVG(grade) AS avg_grade FROM grades GROUP BY studentid;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[38]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>avg_grade</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>3.4799999999999995</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2.9</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Now we know enough to use grouping to compute each student's GPA:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid, SUM(grade*credits)/SUM(credits) AS GPA FROM grades GROUP BY studentid;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[39]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>GPA</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>3.41875</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2.8625</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>This takes the total gradepoints of each group and divides them by the total credits in that group. Since the grouping is by studentid, each student is a group, and each group contains the rows for that student. So any aggregate functions operate on the rows for each student independently.</p>
-<p>If you combine the WHERE clause with an aggregate query, the WHERE clause filters the input rows before grouping. So here is the GPA of all students just for their Physics classes:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT * FROM grades WHERE course LIKE "PY%";
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[40]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>3.2</td>
-<td>4</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>3.1</td>
-<td>4</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-<td>3.1</td>
-<td>3</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY411</td>
-<td>2.8</td>
-<td>4</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY412</td>
-<td>2.4</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>If you add a HAVING clause, this filters the groups. It's essentially like the WHERE clause except it applies <em>after</em> grouping instead of before. You can use aggregate expressions in the HAVING clause.</p>
-<p>This selects students that have a GPA greater than 3. Notice how we don't actually select the GPA into the results, we just get the studentids, and calculate the GPA in the HAVING clause.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [41]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid FROM grades GROUP BY studentid HAVING SUM(grade*credits)/SUM(credits) &gt;= 3;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[41]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>You can also refer to a column name in other clauses. So if you <em>do</em> want the GPA in the results, to avoid having to duplicate the expression in both clauses, give it a name and refer to it by name:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [42]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">sql</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">studentid</span><span class="p">,</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">grade</span><span class="o">*</span><span class="n">credits</span><span class="p">)</span><span class="o">/</span><span class="k">SUM</span><span class="p">(</span><span class="n">credits</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">GPA</span><span class="w"> </span>
-<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">grades</span>
-<span class="w">    </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">studentid</span>
-<span class="w">    </span><span class="k">HAVING</span><span class="w"> </span><span class="n">GPA</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[42]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>GPA</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>3.41875</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Two-more-notes-on-Aggregate-Queries">Two more notes on Aggregate Queries<a class="anchor-link" href="#Two-more-notes-on-Aggregate-Queries">¶</a></h4><p><strong>1.</strong> if you use an <em>aggregate function</em> but don't use a GROUP BY clause, the query is still an aggregate query, but with one large group containing every row.</p>
-<p>This is the total GPA of all students, which may or may not be meaningful.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [43]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT SUM(grade*credits)/SUM(credits) AS GPA FROM grades;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[43]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>GPA</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3.140625</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>2.</strong> If you select on a column that is neither an aggregate function nor a column named in the GROUP BY, you're essentially asking about a column for which there may be multiple results. This is allowed, but since the results only give one row per group, SQLite will pick an arbitrary row within the group to return, which is usually not meaningful.</p>
-<p>From the <a href="https://www.sqlite.org/lang_select.html#resultset">SQLite docs</a>:</p>
-<blockquote>
-<p>Each expression in the result-set is then evaluated once for each group of rows. If the expression is an aggregate expression, it is evaluated across all rows in the group. Otherwise, it is evaluated against a single arbitrarily chosen row from within the group. If there is more than one non-aggregate expression in the result-set, then all such expressions are evaluated for the same row.</p>
-</blockquote>
-<p>For example, this query groups by students and also selects the course column. But since each student takes more than one course, this will return an arbitrary course for each student.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [44]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid, course FROM grades
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[44]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-</tr>
-<tr>
-<td>1</td>
-<td>CS216</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY411</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY412</td>
-</tr>
-<tr>
-<td>2</td>
-<td>E101</td>
-</tr>
-<tr>
-<td>2</td>
-<td>CS216</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [46]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT studentid, course FROM grades GROUP BY studentid;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[46]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Joins">Joins<a class="anchor-link" href="#Joins">¶</a></h3><p>Joins are one of the most powerful features of SQL, but are also tricky to master. They allow you to join two or more tables of data together. Before we get started, we'll need another table of data.</p>
-<p>Let's import the contents of demographics.csv into our database, this one with just 3 rows:</p>
-<pre><code>studentid,gender,age
-1,m,22
-2,f,19
-3,m,20
-</code></pre>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [47]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Load the CSV data</span>
-<span class="n">csv_file_path</span> <span class="o">=</span> <span class="s1">'demographics.csv'</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_file_path</span><span class="p">)</span>
-
-<span class="c1"># Connect to SQLite database (or create it if it doesn't exist)</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">'students_demographics.db'</span><span class="p">)</span>
-
-<span class="c1"># Save the DataFrame to an SQLite table</span>
-<span class="n">data</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">'demographics'</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">if_exists</span><span class="o">=</span><span class="s1">'replace'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># Commit and close the connection</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Data imported into the SQLite database successfully!"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Data imported into the SQLite database successfully!
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [48]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> sqlite:///students_demographics.db
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> SELECT * FROM demographics;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///students_demographics.db
-   sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[49]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>gender</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>2</td>
-<td>f</td>
-<td>19</td>
-</tr>
-<tr>
-<td>3</td>
-<td>m</td>
-<td>20</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Now we can join the tables together. At its core, a join is simply a cartesian-product of the rows in two input tables. So for every row in one input table, every row in the second table will be returned.</p>
-<p>From the <a href="https://www.sqlite.org/lang_select.html#fromclause">SQLite docs</a>:</p>
-<blockquote>
-<p>There is a row in the cartesian product dataset formed by combining each unique combination of a row from the left-hand and right-hand datasets. In other words, if the left-hand dataset consists of Nleft rows of Mleft columns, and the right-hand dataset of Nright rows of Mright columns, then the cartesian product is a dataset of Nleft×Nright rows, each containing Mleft+Mright columns.</p>
-</blockquote>
-<p>The following is a nonsensical query demonstrating this, but it's an important mental model to have for how joins work. Interacting with more that one database is a bit complicated using our kernel, so we go back to our previous method on how to connect to a database.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [50]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Connect to the first database (students_grades.db)</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">'students_grades.db'</span><span class="p">)</span>
-<span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-
-<span class="c1"># Attach the second database (demographics.db)</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"ATTACH DATABASE 'students_demographics.db' AS demo_db;"</span><span class="p">)</span>
-
-<span class="c1"># Perform the join query between the grades table and the demographics table</span>
-<span class="n">query</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">SELECT g.*, d.*</span>
-<span class="s2">FROM grades g</span>
-<span class="s2">JOIN demo_db.demographics d</span>
-<span class="s2">ON g.studentid = d.studentid;</span>
-<span class="s2">"""</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-
-<span class="c1"># Fetch all results from the query</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-
-<span class="c1"># Print the results</span>
-<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-
-<span class="c1"># Detach the attached database and close the connection</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"DETACH DATABASE demo_db;"</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>(1, 'PY205', 3.8, 3, 1, 'm', 22)
-(1, 'PY411', 3.2, 4, 1, 'm', 22)
-(1, 'PY412', 3.1, 4, 1, 'm', 22)
-(1, 'E101', 3.8, 2, 1, 'm', 22)
-(1, 'CS216', 3.5, 3, 1, 'm', 22)
-(2, 'PY205', 3.1, 3, 2, 'f', 19)
-(2, 'PY411', 2.8, 4, 2, 'f', 19)
-(2, 'PY412', 2.4, 4, 2, 'f', 19)
-(2, 'E101', 2.9, 2, 2, 'f', 19)
-(2, 'CS216', 3.3, 3, 2, 'f', 19)
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [51]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> sqlite:///students_grades.db
-
-<span class="c1"># Now attach the second database (demographics.db)</span>
-<span class="o">%</span><span class="k">sql</span> ATTACH DATABASE 'students_demographics.db' AS demo_db;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>   sqlite:///students_demographics.db
- * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[51]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[]</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [52]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Query to join grades from students_grades.db and demographics from demo_db</span>
-<span class="o">%</span><span class="k">sql</span> SELECT g.*, d.* FROM grades g JOIN demo_db.demographics d ON g.studentid = d.studentid;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>   sqlite:///students_demographics.db
- * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[52]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>course</th>
-<th>grade</th>
-<th>credits</th>
-<th>studentid_1</th>
-<th>gender</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>PY205</td>
-<td>3.8</td>
-<td>3</td>
-<td>1</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY411</td>
-<td>3.2</td>
-<td>4</td>
-<td>1</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>1</td>
-<td>PY412</td>
-<td>3.1</td>
-<td>4</td>
-<td>1</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>1</td>
-<td>E101</td>
-<td>3.8</td>
-<td>2</td>
-<td>1</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>1</td>
-<td>CS216</td>
-<td>3.5</td>
-<td>3</td>
-<td>1</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY205</td>
-<td>3.1</td>
-<td>3</td>
-<td>2</td>
-<td>f</td>
-<td>19</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY411</td>
-<td>2.8</td>
-<td>4</td>
-<td>2</td>
-<td>f</td>
-<td>19</td>
-</tr>
-<tr>
-<td>2</td>
-<td>PY412</td>
-<td>2.4</td>
-<td>4</td>
-<td>2</td>
-<td>f</td>
-<td>19</td>
-</tr>
-<tr>
-<td>2</td>
-<td>E101</td>
-<td>2.9</td>
-<td>2</td>
-<td>2</td>
-<td>f</td>
-<td>19</td>
-</tr>
-<tr>
-<td>2</td>
-<td>CS216</td>
-<td>3.3</td>
-<td>3</td>
-<td>2</td>
-<td>f</td>
-<td>19</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [53]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> DETACH DATABASE demo_db;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>   sqlite:///students_demographics.db
- * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[53]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[]</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [54]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> sqlite:///students_grades.db
-
-<span class="c1"># Now attach the second database (demographics.db)</span>
-<span class="o">%</span><span class="k">sql</span> ATTACH DATABASE 'students_demographics.db' AS demo_db;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>   sqlite:///students_demographics.db
- * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[54]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[]</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Joins-and-grouping">Joins and grouping<a class="anchor-link" href="#Joins-and-grouping">¶</a></h4><p>Joins work with groups just as you'd expect. All joins happen before grouping, so you can get a student's demographic information along with their GPA in one query:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [55]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">sql</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="k">g</span><span class="p">.</span><span class="n">studentid</span><span class="p">,</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="k">g</span><span class="p">.</span><span class="n">grade</span><span class="o">*</span><span class="k">g</span><span class="p">.</span><span class="n">credits</span><span class="p">)</span><span class="o">/</span><span class="k">SUM</span><span class="p">(</span><span class="k">g</span><span class="p">.</span><span class="n">credits</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">GPA</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">gender</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">age</span>
-<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">grades</span><span class="w"> </span><span class="k">g</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">demo_db</span><span class="p">.</span><span class="n">demographics</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">g</span><span class="p">.</span><span class="n">studentid</span><span class="o">=</span><span class="n">d</span><span class="p">.</span><span class="n">studentid</span>
-<span class="w">    </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">g</span><span class="p">.</span><span class="n">studentid</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>   sqlite:///students_demographics.db
- * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[55]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>GPA</th>
-<th>gender</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>3.41875</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2.8625</td>
-<td>f</td>
-<td>19</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Outer-joins">Outer joins<a class="anchor-link" href="#Outer-joins">¶</a></h4><p>Left Outer joins are the other join type supported by SQLite. It's not as useful but it's still good to know about it.</p>
-<p>An inner join as seen above is easy to think about as a simple filter on the cartesian product of two tables. A left outer join, however, is useful when you want to return <em>every</em> row on the left-hand table <em>whether or not</em> a matching row is found on the right-hand table.</p>
-<p>Notice the demographics table we created above had a third student in it, but that student wasn't in any of our results, because he didn't match any rows in the grades table.</p>
-<p>Here's how we can get every student, and if they have one, their GPA:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [56]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">sql</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">studentid</span><span class="p">,</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="k">g</span><span class="p">.</span><span class="n">grade</span><span class="o">*</span><span class="k">g</span><span class="p">.</span><span class="n">credits</span><span class="p">)</span><span class="o">/</span><span class="k">sum</span><span class="p">(</span><span class="k">g</span><span class="p">.</span><span class="n">credits</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">GPA</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">gender</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">age</span>
-<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">demo_db</span><span class="p">.</span><span class="n">demographics</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">grades</span><span class="w"> </span><span class="k">g</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">studentid</span><span class="o">=</span><span class="k">g</span><span class="p">.</span><span class="n">studentid</span>
-<span class="w">    </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">g</span><span class="p">.</span><span class="n">studentid</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>   sqlite:///students_demographics.db
- * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[56]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>studentid</th>
-<th>GPA</th>
-<th>gender</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3</td>
-<td>None</td>
-<td>m</td>
-<td>20</td>
-</tr>
-<tr>
-<td>1</td>
-<td>3.41875</td>
-<td>m</td>
-<td>22</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2.8625</td>
-<td>f</td>
-<td>19</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [57]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> DETACH DATABASE demo_db;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>   sqlite:///students_demographics.db
- * sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[57]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[]</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>And there you have it. Student 3's GPA is left blank because he didn't have any matching courses in the grades table.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Advanced-Example:-HR-Database">Advanced Example: HR Database<a class="anchor-link" href="#Advanced-Example:-HR-Database">¶</a></h2><hr/>
-<p>Suppose that you are creating a HR app for a firm. You have to create a simple database to store the employees' information. However, you want to apply the DRY principle and avoid redundancy in your code. Here is a example on how to create a database and insert data into it.</p>
-<p>Let's first define a class to handle the database connection and the cursor.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [58]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Employee</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""A sample Employee class"""</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">last</span><span class="p">,</span> <span class="n">pay</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">first</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">last</span> <span class="o">=</span> <span class="n">last</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pay</span> <span class="o">=</span> <span class="n">pay</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">'</span><span class="si">{}</span><span class="s1">.</span><span class="si">{}</span><span class="s1">@email.com'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">fullname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">'</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">"Employee('</span><span class="si">{}</span><span class="s2">', '</span><span class="si">{}</span><span class="s2">', </span><span class="si">{}</span><span class="s2">)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pay</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [61]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1">#conn = sqlite3.connect(':memory:')</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"employees.db"</span><span class="p">)</span>
-
-<span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-
-<span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""create table employees (</span>
-<span class="s2">            first text,</span>
-<span class="s2">            last text,</span>
-<span class="s2">            pay integer</span>
-<span class="s2">            )"""</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[61]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;sqlite3.Cursor at 0x7f96e050c9c0&gt;</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [62]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">insert_emp</span><span class="p">(</span><span class="n">emp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">""" Insert an employee into the database """</span>
-    <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO employees VALUES (:first, :last, :pay)"</span><span class="p">,</span> <span class="p">{</span><span class="s1">'first'</span><span class="p">:</span> <span class="n">emp</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="s1">'last'</span><span class="p">:</span> <span class="n">emp</span><span class="o">.</span><span class="n">last</span><span class="p">,</span> <span class="s1">'pay'</span><span class="p">:</span> <span class="n">emp</span><span class="o">.</span><span class="n">pay</span><span class="p">})</span>
-
-
-<span class="k">def</span> <span class="nf">get_emps_by_name</span><span class="p">(</span><span class="n">lastname</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">""" Get employees by last name """</span>
-    <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT * FROM employees WHERE last=:last"</span><span class="p">,</span> <span class="p">{</span><span class="s1">'last'</span><span class="p">:</span> <span class="n">lastname</span><span class="p">})</span>
-    <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">update_pay</span><span class="p">(</span><span class="n">emp</span><span class="p">,</span> <span class="n">pay</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">""" Update an employee's pay """</span>
-    <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""UPDATE employees SET pay = :pay</span>
-<span class="s2">                    WHERE first = :first AND last = :last"""</span><span class="p">,</span>
-                  <span class="p">{</span><span class="s1">'first'</span><span class="p">:</span> <span class="n">emp</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="s1">'last'</span><span class="p">:</span> <span class="n">emp</span><span class="o">.</span><span class="n">last</span><span class="p">,</span> <span class="s1">'pay'</span><span class="p">:</span> <span class="n">pay</span><span class="p">})</span>
-
-
-<span class="k">def</span> <span class="nf">remove_emp</span><span class="p">(</span><span class="n">emp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">""" Remove an employee from the database """</span>
-    <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"DELETE from employees WHERE first = :first AND last = :last"</span><span class="p">,</span>
-                  <span class="p">{</span><span class="s1">'first'</span><span class="p">:</span> <span class="n">emp</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="s1">'last'</span><span class="p">:</span> <span class="n">emp</span><span class="o">.</span><span class="n">last</span><span class="p">})</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Let's add two new emloyees to the database:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [63]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">emp_1</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="s1">'John'</span><span class="p">,</span> <span class="s1">'Doe'</span><span class="p">,</span> <span class="mi">80000</span><span class="p">)</span>
-<span class="n">emp_2</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="s1">'Jane'</span><span class="p">,</span> <span class="s1">'Doe'</span><span class="p">,</span> <span class="mi">90000</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [64]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">insert_emp</span><span class="p">(</span><span class="n">emp_1</span><span class="p">)</span>
-<span class="n">insert_emp</span><span class="p">(</span><span class="n">emp_2</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [65]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">sql</span> sqlite:///employees.db
-<span class="o">%</span><span class="k">sql</span> SELECT * FROM employees;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///employees.db
-   sqlite:///students_demographics.db
-   sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[65]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>first</th>
-<th>last</th>
-<th>pay</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>John</td>
-<td>Doe</td>
-<td>80000</td>
-</tr>
-<tr>
-<td>Jane</td>
-<td>Doe</td>
-<td>90000</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Search employees by name Doe in the database:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [66]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">emps</span> <span class="o">=</span> <span class="n">get_emps_by_name</span><span class="p">(</span><span class="s1">'Doe'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">emps</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[('John', 'Doe', 80000), ('Jane', 'Doe', 90000)]
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Do some updates in the database:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [67]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">update_pay</span><span class="p">(</span><span class="n">emp_2</span><span class="p">,</span> <span class="mi">95000</span><span class="p">)</span>
-
-<span class="o">%</span><span class="k">sql</span> SELECT * FROM employees;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> * sqlite:///employees.db
-   sqlite:///students_demographics.db
-   sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[67]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>first</th>
-<th>last</th>
-<th>pay</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>John</td>
-<td>Doe</td>
-<td>80000</td>
-</tr>
-<tr>
-<td>Jane</td>
-<td>Doe</td>
-<td>95000</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [68]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">remove_emp</span><span class="p">(</span><span class="n">emp_1</span><span class="p">)</span>
-<span class="n">emps</span> <span class="o">=</span> <span class="n">get_emps_by_name</span><span class="p">(</span><span class="s1">'Doe'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">emps</span><span class="p">)</span>
-
-<span class="o">%</span><span class="k">sql</span> SELECT * FROM employees;
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[('Jane', 'Doe', 95000)]
- * sqlite:///employees.db
-   sqlite:///students_demographics.db
-   sqlite:///students_grades.db
-Done.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[68]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>first</th>
-<th>last</th>
-<th>pay</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Jane</td>
-<td>Doe</td>
-<td>95000</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [69]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-</div>
+<p>Notice that two new CSV files will be created in the project directory: <code>first-page-results.csv</code> and <code>second-page-results.csv</code>. These will contain the results data extracted from the tables. This completes the tutorial for setting up web scraping using MechanicalSoup in Python!</p>
 </div>
 </div>
 </div>
