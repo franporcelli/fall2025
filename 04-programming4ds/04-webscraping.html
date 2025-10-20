@@ -7710,7 +7710,7 @@ If you simply need to extract data from downloaded HTML content, <code>Beautiful
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">mechanicalsoup</span>
@@ -7724,11 +7724,13 @@ If you simply need to extract data from downloaded HTML content, <code>Beautiful
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Connect to the website</span>
-<span class="n">browser</span> <span class="o">=</span> <span class="n">mechanicalsoup</span><span class="o">.</span><span class="n">StatefulBrowser</span><span class="p">()</span>  
+<span class="n">browser</span> <span class="o">=</span> <span class="n">mechanicalsoup</span><span class="o">.</span><span class="n">StatefulBrowser</span><span class="p">(</span>
+    <span class="n">user_agent</span><span class="o">=</span><span class="s1">'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'</span>
+<span class="p">)</span>  
 <span class="n">browser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"https://en.wikipedia.org/wiki/Web_scraping"</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -7740,7 +7742,7 @@ If you simply need to extract data from downloaded HTML content, <code>Beautiful
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>&lt;Response [200]&gt;</pre>
 </div>
@@ -7767,7 +7769,7 @@ If you simply need to extract data from downloaded HTML content, <code>Beautiful
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">title</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'span.mw-page-title-main'</span><span class="p">)</span>
@@ -7814,7 +7816,7 @@ If you simply need to extract data from downloaded HTML content, <code>Beautiful
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Select the **References section**</span>
@@ -7851,6 +7853,7 @@ https://search.worldcat.org/issn/1683-1470
 /wiki/S2CID_(identifier)
 https://api.semanticscholar.org/CorpusID:237719804
 http://www.searchenginehistory.com/
+https://thehistoryoftheweb.com/ebay-apis-connected-web/
 https://web.archive.org/web/20161011080619/https://pdfs.semanticscholar.org/4fb4/3c5a212df751e84c3b2f8d29fabfe56c3616.pdf
 /wiki/Doi_(identifier)
 https://doi.org/10.1145%2F1281192.1281287
@@ -7861,11 +7864,6 @@ https://api.semanticscholar.org/CorpusID:833565
 https://pdfs.semanticscholar.org/4fb4/3c5a212df751e84c3b2f8d29fabfe56c3616.pdf
 http://www.gooseeker.com/en/node/knowledgebase/freeformat
 http://www.xconomy.com/san-francisco/2012/07/25/diffbot-is-using-computer-vision-to-reinvent-the-semantic-web/
-https://doi.org/10.1016%2Fj.jbusres.2020.06.012
-/wiki/Doi_(identifier)
-https://doi.org/10.1016%2Fj.jbusres.2020.06.012
-/wiki/ISSN_(identifier)
-https://search.worldcat.org/issn/0148-2963
 https://web.archive.org/web/20020308222536/http://www.chillingeffects.org/linking/faq.cgi#QID596
 http://www.chillingeffects.org/linking/faq.cgi#QID596
 http://scholarship.law.berkeley.edu/btlj/vol29/iss4/16/
@@ -7899,6 +7897,7 @@ https://www.reuters.com/technology/us-supreme-court-revives-linkedin-bid-shield-
 https://techcrunch.com/2022/04/18/web-scraping-legal-court/
 https://web.archive.org/web/20071012005033/http://www.bvhd.dk/uploads/tx_mocarticles/S_-_og_Handelsrettens_afg_relse_i_Ofir-sagen.pdf
 http://www.bvhd.dk/uploads/tx_mocarticles/S_-_og_Handelsrettens_afg_relse_i_Ofir-sagen.pdf
+https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 http://www.bailii.org/ie/cases/IEHC/2010/H47.html
 https://web.archive.org/web/20120624103316/http://www.lkshields.ie/htmdocs/publications/newsletters/update26/update26_03.htm
 http://www.lkshields.ie/htmdocs/publications/newsletters/update26/update26_03.htm
@@ -7931,7 +7930,7 @@ https://s3.us-west-2.amazonaws.com/research-papers-mynk/Breaking-Fraud-And-Bot-D
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">browser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"https://www.scrapethissite.com/"</span><span class="p">)</span>
@@ -7971,7 +7970,7 @@ https://s3.us-west-2.amazonaws.com/research-papers-mynk/Breaking-Fraud-And-Bot-D
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">sandbox_nav_link</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s1">'li#nav-sandbox'</span><span class="p">)</span>
@@ -8029,7 +8028,7 @@ https://s3.us-west-2.amazonaws.com/research-papers-mynk/Breaking-Fraud-And-Bot-D
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">sandbox_list_items</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'div.page'</span><span class="p">)</span>
@@ -8075,7 +8074,7 @@ https://s3.us-west-2.amazonaws.com/research-papers-mynk/Breaking-Fraud-And-Bot-D
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">navigate</span><span class="p">():</span>
@@ -8110,7 +8109,7 @@ https://s3.us-west-2.amazonaws.com/research-papers-mynk/Breaking-Fraud-And-Bot-D
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">navigate</span><span class="p">()</span>
@@ -8153,7 +8152,7 @@ https://www.scrapethissite.com/pages/forms/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">csv</span>
@@ -8215,7 +8214,7 @@ https://www.scrapethissite.com/pages/forms/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">handle_form</span><span class="p">():</span>
@@ -8236,7 +8235,7 @@ https://www.scrapethissite.com/pages/forms/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">handle_form</span><span class="p">()</span>
@@ -8276,7 +8275,7 @@ https://www.scrapethissite.com/pages/forms/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">handle_pagination</span><span class="p">():</span>
@@ -8305,7 +8304,7 @@ https://www.scrapethissite.com/pages/forms/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">handle_pagination</span><span class="p">()</span>
