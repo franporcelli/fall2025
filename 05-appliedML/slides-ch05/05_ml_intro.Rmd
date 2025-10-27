@@ -1,0 +1,433 @@
+---
+title: "Lecture 2"
+subtitle: "Introduction to Machine Learning"
+author: Marcelo Ortiz-Villavicencio
+date: ECON 725, Emory University
+output:
+  xaringan::moon_reader:
+    includes:
+        in_header: "mathjax-equation-numbers.html"
+        after_body: "insert-logo.html"
+    css: ['default', 'metropolis', 'metropolis-fonts', 'emory-colors.css']
+    # self_contained: true
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+    seal: false
+
+---
+
+
+```{r setup, include=FALSE}
+# xaringanExtra::use_scribble() ## Draw on slides. Requires dev version of xaringanExtra.
+library(tidyverse)
+library(hrbrthemes)
+library(fontawesome)
+```
+
+
+class: title-slide   
+
+
+
+# Econ 725: Computer Programming and Data Management in Economics 
+
+## Introduction to Machine Learning
+
+<p align=center>
+Marcelo Ortiz-Villavicencio
+</p>
+<div style="margin-top: -.7cm;"></div>
+<p align=center>
+Emory University
+</p>
+</p>
+<br>
+<p align=center>
+Fall 2025
+</p>
+
+---
+class: center, middle
+
+# What is Machine Learning?
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1100px></html>
+
+---
+
+# AI and Machine Learning
+
+.pull-left[
+**Artificial Intelligence (AI)**
+
+A huge set of tools for making computers behave intelligently
+
+**Machine Learning (ML)**
+
+Machine learning is the most prevalent subset of AI
+]
+
+.pull-right[
+<div align="center">
+<img src="https://www.qubole.com/wp-content/uploads/2018/08/1-400x387.png" width="80%">
+</div>
+]
+
+---
+
+# Defining machine learning
+
+A set of tools for making inferences and predictions from data
+
+Machine learning enables computers to:
+- Learn patterns from existing data
+- Apply those patterns to new data
+- Do this without being explicitly programmed
+
+<div align="center">
+<img src="https://images.unsplash.com/photo-1555255707-c07966088b7b?w=600" width="30%">
+</div>
+
+---
+
+# What can machine learning do?
+.pull-left[
+**Predict future events**
+- Will it rain tomorrow?
+- Yes (75% probability)
+
+**Infer causes of events and behaviors**
+- Why does it rain? Time of year, humidity, temperature, location, etc.
+
+**Infer patterns**
+- What are different types of weather conditions?
+]
+
+.pull-right[
+<div align="center">
+<img src="https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=400" width="75%">
+</div>
+]
+
+---
+
+# How does machine learning work?
+
+Key characteristics:
+
+- Interdisciplinary mix of statistics and computer science
+
+- Ability to learn without being explicitly programmed
+
+- Learns patterns from existing data and applies it to new data
+
+- Relies on high-quality data
+
+
+---
+
+# Data science and machine learning
+
+.pull-left[
+**Data Science**
+
+About discovering and communicating insights from data
+
+**Machine Learning**
+
+Often an important tool for data science work
+]
+
+.pull-right[
+<div align="center">
+<img src="https://www.deviq.io/hs-fs/hubfs/DevIQ%20website%20active%20images/ai-ml-dl-ds-venn-diagram-deviq.png?width=449&name=ai-ml-dl-ds-venn-diagram-deviq.png" width="80%">
+</div>
+]
+
+---
+
+# Machine learning model
+
+A statistical representation of a real-world process based on data
+
+<div align="center">
+<img src="https://www.neuraldesigner.com/images/activity-diagram-sales-forecasting.svg" width="60%">
+</div>
+
+---
+
+# Machine learning model: Input → Output
+
+<div align="center">
+<img src="https://cdn.route-fifty.com/media/img/cd/2022/05/06/GettyImages_1137862835/860x394.jpg?1651854133" width="70%">
+</div>
+
+**Example: Traffic prediction**
+- Input: current traffic conditions
+- Output: prediction about traffic in the next hour
+
+---
+
+# Machine learning model: Another example
+
+<div align="center">
+<img src="https://www.mdpi.com/applsci/applsci-13-13070/article_deploy/html/images/applsci-13-13070-g001.png" width="30%">
+</div>
+
+**Example: Fake news detection**
+- Input: tweet
+- Output: probability it's fake
+
+---
+class: center, middle
+
+# Types of Machine Learning
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1100px></html>
+
+---
+
+# Three types of machine learning
+
+1. **Reinforcement learning**
+   - Learning through trial and error with rewards/penalties
+
+2. **Supervised learning**
+   - Learning from labeled data
+
+3. **Unsupervised learning**
+   - Finding patterns in unlabeled data
+
+---
+
+# Training data
+
+**Training data:** existing data to learn from
+
+**Training a model:** when a model is being built from training data
+- Can take nanoseconds to weeks
+
+The quality and quantity of training data significantly impacts model performance
+
+---
+
+# Supervised learning: Training data
+
+<div align="center">
+<img src="pics/training_data.png" width="85%">
+</div>
+
+---
+
+# Supervised learning: Target variable
+
+<div align="center">
+<img src="pics/target_variable.png" width="80%">
+</div>
+
+Target variable: what we want to predict (Heart disease)
+
+---
+
+# Supervised learning: Labels
+
+<div align="center">
+<img src="pics/labels.png" width="80%">
+</div>
+
+Labels: the actual values of the target variable in training data
+
+---
+
+# Supervised learning: Observations
+
+<div align="center">
+<img src="pics/observations.png" width="80%">
+</div>
+
+Observations (or Examples): individual rows of data
+
+---
+
+# Supervised learning: Features
+
+<div align="center">
+<img src="pics/feature.png" width="80%">
+</div>
+
+Features: input variables used to make predictions
+
+---
+
+# After training: Making predictions
+
+<div align="center">
+<img src="pics/making_predictions.png" width="70%">
+</div>
+
+New patient data (without heart disease label) → Model → Prediction
+
+---
+
+# Supervised vs Unsupervised learning
+
+.pull-left[
+**Supervised learning**
+- Training data is "labeled"
+- Learn to predict target variable
+
+**Unsupervised learning**
+- Training data only has features
+- No target variable
+- Useful for:
+  - Anomaly detection
+  - Clustering (dividing data into groups)
+]
+
+.pull-right[
+<div align="center">
+<img src="pics/supervised_unsupervised.png" width="70%">
+</div>
+]
+
+---
+
+# Unsupervised learning: Example
+
+<div align="center">
+<img src="pics/unsupervised_example.png" width="75%">
+</div>
+
+Finding patterns without labels
+
+---
+
+# Unsupervised learning: Clustering
+
+<div align="center">
+<img src="pics/clustering.png" width="65%">
+</div>
+
+Model identifies patient types based on features
+
+---
+
+# After training: Unsupervised learning
+
+<div align="center">
+<img src="pics/after_training_clustering.png" width="60%">
+</div>
+
+New patient → Model → Assigned to Patient Type 2
+
+---
+
+# Why unsupervised learning?
+
+In reality, data doesn't always come with labels:
+
+- Requires manual labor to label
+- Labels are unknown
+- Labels may not exist
+
+No labels: model is unsupervised and finds its own patterns
+
+---
+class: center, middle
+
+# Machine Learning Workflow
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1100px></html>
+
+---
+
+# Our scenario: NYC property sales
+
+.pull-left[
+<div align="center">
+<img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=500" width="90%">
+</div>
+]
+
+.pull-right[
+**Our dataset:** NYC property sales from 2015-2019
+
+**Includes:**
+- Square feet
+- Neighborhood
+- Year built
+- Sale price
+- And more!
+
+**Our target:** Sale price
+]
+
+
+---
+
+# The workflow: Overview
+
+<div align="center">
+<img src="pics/ml_workflow.png" width="80%">
+</div>
+
+From historical data to trained model
+
+---
+
+
+# Evaluation
+
+<div align="center">
+<img src="pics/evaluate_model.png" width="75%">
+</div>
+
+Use test dataset to evaluate model performance
+
+---
+
+# Evaluation: Is performance good enough?
+
+<div align="center">
+<img src="pics/performance_model.png" width="45%">
+</div>
+
+**Many ways to evaluate:**
+- What is the average error of the predictions?
+- What percent of apartments did the model accurately predict within a 10% margin?
+
+If performance is good → Use model
+
+If not → Tune and retrain
+
+---
+
+# Summary: ML workflow steps
+
+**1. Extract features**
+- Choosing features and manipulating the dataset
+
+**2. Split dataset**
+- Train and test dataset
+
+**3. Train model**
+- Input train dataset into a machine learning model
+
+**4. Evaluate**
+- If desired performance isn't reached: tune the model and repeat Step 3
+
+---
+
+class: center, middle, thank-you-slide
+# Thanks!
+
+
+`r fa('link')` [marcelortiz.com](https://marcelortiz.com/)
+
+`r fa('envelope')` [marcelo.ortiz@emory.edu](mailto:marcelo.ortiz@emory.edu)
+
+`r fa('twitter')` [@marcelortizv](https://twitter.com/marcelortizv)

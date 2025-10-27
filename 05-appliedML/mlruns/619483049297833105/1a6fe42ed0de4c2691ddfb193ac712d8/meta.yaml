@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/econ725-fall2024/05-appliedML/mlruns/619483049297833105/1a6fe42ed0de4c2691ddfb193ac712d8/artifacts
+end_time: 1761523267098
+entry_point_name: ''
+experiment_id: '619483049297833105'
+lifecycle_stage: active
+run_id: 1a6fe42ed0de4c2691ddfb193ac712d8
+run_name: glamorous-newt-399
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761523267082
+status: 3
+tags: []
+user_id: marcelortizv

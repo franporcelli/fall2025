@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Marcelo Ortiz-Villavicencio" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            TeX: { equationNumbers: { autoNumber: "AMS" } },
+        });
+    </script>
+        <style>
+        .mjx-mrow a {
+            color: black;
+            pointer-events: none;
+            cursor: default;
+        }
+    </style>
+    <link rel="stylesheet" href="emory-colors.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+class: title-slide   
+
+
+
+# Econ 725: Computer Programming and Data Management in Economics 
+
+## Introduction to Machine Learning
+
+&lt;p align=center&gt;
+Marcelo Ortiz-Villavicencio
+&lt;/p&gt;
+&lt;div style="margin-top: -.7cm;"&gt;&lt;/div&gt;
+&lt;p align=center&gt;
+Emory University
+&lt;/p&gt;
+&lt;/p&gt;
+&lt;br&gt;
+&lt;p align=center&gt;
+Fall 2025
+&lt;/p&gt;
+
+---
+class: center, middle
+
+# What is Machine Learning?
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=1100px&gt;&lt;/html&gt;
+
+---
+
+# AI and Machine Learning
+
+.pull-left[
+**Artificial Intelligence (AI)**
+
+A huge set of tools for making computers behave intelligently
+
+**Machine Learning (ML)**
+
+Machine learning is the most prevalent subset of AI
+]
+
+.pull-right[
+&lt;div align="center"&gt;
+&lt;img src="https://www.qubole.com/wp-content/uploads/2018/08/1-400x387.png" width="80%"&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Defining machine learning
+
+A set of tools for making inferences and predictions from data
+
+Machine learning enables computers to:
+- Learn patterns from existing data
+- Apply those patterns to new data
+- Do this without being explicitly programmed
+
+&lt;div align="center"&gt;
+&lt;img src="https://images.unsplash.com/photo-1555255707-c07966088b7b?w=600" width="30%"&gt;
+&lt;/div&gt;
+
+---
+
+# What can machine learning do?
+.pull-left[
+**Predict future events**
+- Will it rain tomorrow?
+- Yes (75% probability)
+
+**Infer causes of events and behaviors**
+- Why does it rain? Time of year, humidity, temperature, location, etc.
+
+**Infer patterns**
+- What are different types of weather conditions?
+]
+
+.pull-right[
+&lt;div align="center"&gt;
+&lt;img src="https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=400" width="75%"&gt;
+&lt;/div&gt;
+]
+
+---
+
+# How does machine learning work?
+
+Key characteristics:
+
+- Interdisciplinary mix of statistics and computer science
+
+- Ability to learn without being explicitly programmed
+
+- Learns patterns from existing data and applies it to new data
+
+- Relies on high-quality data
+
+
+---
+
+# Data science and machine learning
+
+.pull-left[
+**Data Science**
+
+About discovering and communicating insights from data
+
+**Machine Learning**
+
+Often an important tool for data science work
+]
+
+.pull-right[
+&lt;div align="center"&gt;
+&lt;img src="https://www.deviq.io/hs-fs/hubfs/DevIQ%20website%20active%20images/ai-ml-dl-ds-venn-diagram-deviq.png?width=449&amp;name=ai-ml-dl-ds-venn-diagram-deviq.png" width="80%"&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Machine learning model
+
+A statistical representation of a real-world process based on data
+
+&lt;div align="center"&gt;
+&lt;img src="https://www.neuraldesigner.com/images/activity-diagram-sales-forecasting.svg" width="60%"&gt;
+&lt;/div&gt;
+
+---
+
+# Machine learning model: Input → Output
+
+&lt;div align="center"&gt;
+&lt;img src="https://cdn.route-fifty.com/media/img/cd/2022/05/06/GettyImages_1137862835/860x394.jpg?1651854133" width="70%"&gt;
+&lt;/div&gt;
+
+**Example: Traffic prediction**
+- Input: current traffic conditions
+- Output: prediction about traffic in the next hour
+
+---
+
+# Machine learning model: Another example
+
+&lt;div align="center"&gt;
+&lt;img src="https://www.mdpi.com/applsci/applsci-13-13070/article_deploy/html/images/applsci-13-13070-g001.png" width="30%"&gt;
+&lt;/div&gt;
+
+**Example: Fake news detection**
+- Input: tweet
+- Output: probability it's fake
+
+---
+class: center, middle
+
+# Types of Machine Learning
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=1100px&gt;&lt;/html&gt;
+
+---
+
+# Three types of machine learning
+
+1. **Reinforcement learning**
+   - Learning through trial and error with rewards/penalties
+
+2. **Supervised learning**
+   - Learning from labeled data
+
+3. **Unsupervised learning**
+   - Finding patterns in unlabeled data
+
+---
+
+# Training data
+
+**Training data:** existing data to learn from
+
+**Training a model:** when a model is being built from training data
+- Can take nanoseconds to weeks
+
+The quality and quantity of training data significantly impacts model performance
+
+---
+
+# Supervised learning: Training data
+
+&lt;div align="center"&gt;
+&lt;img src="pics/training_data.png" width="85%"&gt;
+&lt;/div&gt;
+
+---
+
+# Supervised learning: Target variable
+
+&lt;div align="center"&gt;
+&lt;img src="pics/target_variable.png" width="80%"&gt;
+&lt;/div&gt;
+
+Target variable: what we want to predict (Heart disease)
+
+---
+
+# Supervised learning: Labels
+
+&lt;div align="center"&gt;
+&lt;img src="pics/labels.png" width="80%"&gt;
+&lt;/div&gt;
+
+Labels: the actual values of the target variable in training data
+
+---
+
+# Supervised learning: Observations
+
+&lt;div align="center"&gt;
+&lt;img src="pics/observations.png" width="80%"&gt;
+&lt;/div&gt;
+
+Observations (or Examples): individual rows of data
+
+---
+
+# Supervised learning: Features
+
+&lt;div align="center"&gt;
+&lt;img src="pics/feature.png" width="80%"&gt;
+&lt;/div&gt;
+
+Features: input variables used to make predictions
+
+---
+
+# After training: Making predictions
+
+&lt;div align="center"&gt;
+&lt;img src="pics/making_predictions.png" width="70%"&gt;
+&lt;/div&gt;
+
+New patient data (without heart disease label) → Model → Prediction
+
+---
+
+# Supervised vs Unsupervised learning
+
+.pull-left[
+**Supervised learning**
+- Training data is "labeled"
+- Learn to predict target variable
+
+**Unsupervised learning**
+- Training data only has features
+- No target variable
+- Useful for:
+  - Anomaly detection
+  - Clustering (dividing data into groups)
+]
+
+.pull-right[
+&lt;div align="center"&gt;
+&lt;img src="pics/supervised_unsupervised.png" width="70%"&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Unsupervised learning: Example
+
+&lt;div align="center"&gt;
+&lt;img src="pics/unsupervised_example.png" width="75%"&gt;
+&lt;/div&gt;
+
+Finding patterns without labels
+
+---
+
+# Unsupervised learning: Clustering
+
+&lt;div align="center"&gt;
+&lt;img src="pics/clustering.png" width="65%"&gt;
+&lt;/div&gt;
+
+Model identifies patient types based on features
+
+---
+
+# After training: Unsupervised learning
+
+&lt;div align="center"&gt;
+&lt;img src="pics/after_training_clustering.png" width="60%"&gt;
+&lt;/div&gt;
+
+New patient → Model → Assigned to Patient Type 2
+
+---
+
+# Why unsupervised learning?
+
+In reality, data doesn't always come with labels:
+
+- Requires manual labor to label
+- Labels are unknown
+- Labels may not exist
+
+No labels: model is unsupervised and finds its own patterns
+
+---
+class: center, middle
+
+# Machine Learning Workflow
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=1100px&gt;&lt;/html&gt;
+
+---
+
+# Our scenario: NYC property sales
+
+.pull-left[
+&lt;div align="center"&gt;
+&lt;img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=500" width="90%"&gt;
+&lt;/div&gt;
+]
+
+.pull-right[
+**Our dataset:** NYC property sales from 2015-2019
+
+**Includes:**
+- Square feet
+- Neighborhood
+- Year built
+- Sale price
+- And more!
+
+**Our target:** Sale price
+]
+
+
+---
+
+# The workflow: Overview
+
+&lt;div align="center"&gt;
+&lt;img src="pics/ml_workflow.png" width="80%"&gt;
+&lt;/div&gt;
+
+From historical data to trained model
+
+---
+
+
+# Evaluation
+
+&lt;div align="center"&gt;
+&lt;img src="pics/evaluate_model.png" width="75%"&gt;
+&lt;/div&gt;
+
+Use test dataset to evaluate model performance
+
+---
+
+# Evaluation: Is performance good enough?
+
+&lt;div align="center"&gt;
+&lt;img src="pics/performance_model.png" width="45%"&gt;
+&lt;/div&gt;
+
+**Many ways to evaluate:**
+- What is the average error of the predictions?
+- What percent of apartments did the model accurately predict within a 10% margin?
+
+If performance is good → Use model
+
+If not → Tune and retrain
+
+---
+
+# Summary: ML workflow steps
+
+**1. Extract features**
+- Choosing features and manipulating the dataset
+
+**2. Split dataset**
+- Train and test dataset
+
+**3. Train model**
+- Input train dataset into a machine learning model
+
+**4. Evaluate**
+- If desired performance isn't reached: tune the model and repeat Step 3
+
+---
+
+class: center, middle, thank-you-slide
+# Thanks!
+
+
+<svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M579.8 267.7c56.5-56.5 56.5-148 0-204.5c-50-50-128.8-56.5-186.3-15.4l-1.6 1.1c-14.4 10.3-17.7 30.3-7.4 44.6s30.3 17.7 44.6 7.4l1.6-1.1c32.1-22.9 76-19.3 103.8 8.6c31.5 31.5 31.5 82.5 0 114L422.3 334.8c-31.5 31.5-82.5 31.5-114 0c-27.9-27.9-31.5-71.8-8.6-103.8l1.1-1.6c10.3-14.4 6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C206.5 251.2 213 330 263 380c56.5 56.5 148 56.5 204.5 0L579.8 267.7zM60.2 244.3c-56.5 56.5-56.5 148 0 204.5c50 50 128.8 56.5 186.3 15.4l1.6-1.1c14.4-10.3 17.7-30.3 7.4-44.6s-30.3-17.7-44.6-7.4l-1.6 1.1c-32.1 22.9-76 19.3-103.8-8.6C74 372 74 321 105.5 289.5L217.7 177.2c31.5-31.5 82.5-31.5 114 0c27.9 27.9 31.5 71.8 8.6 103.9l-1.1 1.6c-10.3 14.4-6.9 34.4 7.4 44.6s34.4 6.9 44.6-7.4l1.1-1.6C433.5 260.8 427 182 377 132c-56.5-56.5-148-56.5-204.5 0L60.2 244.3z"/></svg> [marcelortiz.com](https://marcelortiz.com/)
+
+<svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M64 112c-8.8 0-16 7.2-16 16v22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64H448c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"/></svg> [marcelo.ortiz@emory.edu](mailto:marcelo.ortiz@emory.edu)
+
+<svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg> [@marcelortizv](https://twitter.com/marcelortizv)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(emory.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: -2em;
+  left: 0em;
+  width: 77px;
+  height: 89px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
