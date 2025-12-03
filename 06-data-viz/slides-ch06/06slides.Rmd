@@ -1,0 +1,233 @@
+---
+title: "Chapter 6"
+subtitle: "Tableau"
+author: Marcelo Ortiz-Villavicencio
+date: ECON 725, Emory University
+output:
+  xaringan::moon_reader:
+    includes:
+        in_header: "mathjax-equation-numbers.html"
+        after_body: "insert-logo.html"
+    css: ['default', 'metropolis', 'metropolis-fonts', 'emory-colors.css']
+    # self_contained: true
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+    seal: false
+
+---
+
+
+```{r setup, include=FALSE}
+# xaringanExtra::use_scribble() ## Draw on slides. Requires dev version of xaringanExtra.
+library(tidyverse)
+library(hrbrthemes)
+library(fontawesome)
+```
+
+
+class: title-slide   
+
+
+
+# Econ 725: Computer Programming and Data Management in Economics 
+
+## Data Visualization and Reporting
+
+<p align=center>
+Marcelo Ortiz-Villavicencio
+</p>
+<div style="margin-top: -.7cm;"></div>
+<p align=center>
+Emory University
+</p>
+</p>
+<br>
+<p align=center>
+Fall 2025
+</p>
+
+---
+class: center, middle
+
+# How to create a Dashboard in Tableau
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1100px></html>
+
+---
+
+# About this chapter
+
+- The goal of this chapter is to understand the importance of creating dashboards and learn to build a simple Tableau dashboard.
+- There are many tools to create dashboards, but Tableau is one of the most popular because of it is available in several OS and has a user-friendly interface.
+
+<div align="center">
+<img src="https://www.tableau.com/sites/default/files/2022-05/Products_Desktop_Intro.png" width="50%">
+</div>
+
+---
+# What is the Purpose of a Dashboard?
+
+.pull-left[
+- **Car Dashboard Analogy**  
+  - Provides real-time information (e.g., speed, fuel, RPM).  
+  - Helps drivers monitor and respond quickly.  
+- **Data Dashboard**  
+  - Displays key metrics (e.g., sales, KPIs, customer feedback).  
+  - Summarizes business events into real-time visualizations.  
+  - Enables fast and effective decision-making.  
+]
+
+.pull-right[
+<div align="center">
+<img src="pics/car-dashboard.png" width="70%">
+</div>
+]
+
+---
+# Benefits of Dashboard reporting
+.pull-left[
+- **Usability**  
+  - Simplifies raw data into valuable insights.  
+  - Access to key metrics on a single screen.  
+- **Access to Data**  
+  - Integrates multiple data sources for detailed reporting.  
+- **Decision Making**  
+  - Detect anomalies, forecast sales, and review historical data.  
+  - Interactive visuals allow deeper exploration and filtering. 
+]
+
+.pull-right[
+- **Accountability**  
+  - Provides an unbiased view of company performance.  
+  - Highlights growth differences and marketing campaign outcomes.  
+- **Interactivity**  
+  - Gamified and dynamic experience for ease of use.  
+  - Features include filtering, zooming, and anomaly alarms.  
+- **Analysis**  
+  - Enables detailed analytical reports.  
+]
+
+---
+
+# Types of Dashboards
+
+- **Operational Dashboards**  
+  - Monitor real-time performance of daily operations.  
+  - Connected to multiple data sources with numerous metrics. 
+--
+
+- **Analytical Dashboards**  
+  - Use historical data to identify trends.  
+  - Aid in detailed reporting and system improvement.  
+  
+--
+
+- **Strategic Dashboards**  
+  - Track performance against key performance indicators (KPIs).  
+  - Align actions with strategic goals.  
+
+---
+# Use Cases of Dashboards
+
+.pull-left[
+- **In Data Science**  
+  - Machine learning operations  
+  - Data streaming and database management  
+
+- **In Business**  
+  - Customer metrics  
+  - Financial and sales information 
+  - Human resources data  
+  - Marketing performance  
+]
+
+.pull-right[
+<div align="center">
+<img src="https://media.datacamp.com/legacy/v1724339564/image_1e5ef5fde3.png" width="80%">
+</div>
+
+]
+
+---
+# How to Create a Data Dashboard
+- **Understand Your Audience**  
+  - Identify their needs and goals.  
+- **Choose Relevant Data**  
+  - Ensure the data is clean and accurate.  
+- **Select Effective Visualizations**  
+  - Pick visualizations that best represent the data.  
+- **Use Templates for Simplicity**  
+  - Start with templates to reduce complexity.  
+- **Design with Clarity**  
+  - Avoid clutter and use simple colors.  
+  - Highlight the most significant insights.  
+- **Iterate and Improve**  
+  - Collect audience feedback and refine the design.
+
+---
+
+class: center, middle
+
+# Demo in Tableau  
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1100px></html>
+
+---
+# Primary Components of Tableau
+
+<div align="center">
+<img src="https://media.datacamp.com/legacy/v1724339565/image_ef4b4a36cd.png" width=80%>
+</div>
+
+
+---
+
+# Data Visualization Sheets
+
+<div align="center">
+<img src="https://media.datacamp.com/legacy/v1724339565/image_897ee66048.png" width=50%>
+</div>
+
+
+---
+# Bottom Panel: Multiple Worksheets
+<div align="center">
+<img src="https://media.datacamp.com/legacy/v1724339564/image_7a84ef0a41.png" width=80%>
+</div>
+
+---
+# Bulding Dashboards
+
+.pull-left[
+- **Canvas**  
+  - To set the size of the dashboard based on various devices  
+- **Sheets**  
+  - For adding and removing worksheets on canvas
+- **Objects**  
+  - For adding text, images, and web pages to the dashboard  
+]
+
+.pull-right[
+<div align="center">
+<img src="https://media.datacamp.com/legacy/v1724339565/image_10cf9f9647.png" width=50%>
+</div>
+]
+
+
+---
+
+class: center, middle, thank-you-slide
+# Thanks!
+
+
+`r fa('link')` [marcelortiz.com](https://marcelortiz.com/)
+
+`r fa('envelope')` [marcelo.ortiz@emory.edu](mailto:marcelo.ortiz@emory.edu)
+
+`r fa('twitter')` [@marcelortizv](https://twitter.com/marcelortizv)
+
+

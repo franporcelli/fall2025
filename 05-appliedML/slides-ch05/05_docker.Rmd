@@ -108,7 +108,7 @@ By far the most widely used and best supported container technology. While there
 You know those big shipping containers used to transport physical goods?
 
 .pull-left[
-<img src="https://containerone.net/cdn/shop/articles/iStock-1284852950_2000x.jpg?v=1618859184"  width="60%">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/MAERSK_MC_KINNEY_M%C3%96LLER_%26_MARSEILLE_MAERSK_%2848694054418%29.jpg/960px-MAERSK_MC_KINNEY_M%C3%96LLER_%26_MARSEILLE_MAERSK_%2848694054418%29.jpg"  width="80%">
 ]
 
 .pull-right[

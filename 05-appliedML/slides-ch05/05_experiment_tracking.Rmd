@@ -215,7 +215,7 @@ This involves using spreadsheets to manually log experiment details.
 
 .pull-right[
 <div align="center">
-<img src="https://viso.ai/wp-content/smush-webp/2024/01/manual-dc-1060x491.jpg.webp"  width="100%">
+<img src="https://viso.ai/wp-content/uploads/2024/01/manual-dc-1060x491.jpg"  width="100%">
 </div>
 ]
 ---
@@ -250,7 +250,7 @@ class: center, middle
 # Demo
 
 <div align="center">
-<img src="https://github.com/wandb/wandb/raw/main/assets/wandb_demo_experiments.gif" width="70%">
+<img src="https://camo.githubusercontent.com/f07f4090c88e640c9cd712588ebc2f001e8dddd9b6acb1cd15bb4018f101cc64/68747470733a2f2f692e696d6775722e636f6d2f5455333451465a2e706e67" width="70%">
 </div>
 ---
 

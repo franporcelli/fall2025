@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Lecture 5</title>
+    <title>Chapter 6</title>
     <meta charset="utf-8" />
     <meta name="author" content="Marcelo Ortiz-Villavicencio" />
-    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.27/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
@@ -36,7 +36,7 @@ class: title-slide
 
 # Econ 725: Computer Programming and Data Management in Economics 
 
-## Applied ML: MLOps and Experiment Tracking
+## Data Visualization and Reporting
 
 &lt;p align=center&gt;
 Marcelo Ortiz-Villavicencio
@@ -54,205 +54,171 @@ Fall 2025
 ---
 class: center, middle
 
-# What is MLOps?
+# How to create a Dashboard in Tableau
 
 &lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=1100px&gt;&lt;/html&gt;
 
 ---
 
-# Machine Learning Operations (MLOps)
+# About this chapter
 
-...is the set of practices to design, deploy and maintain machine learning in production
-continuously, reliably, and efficiently.
-- Focus on machine learning 'in production'
-- The full machine learning lifecycle
+- The goal of this chapter is to understand the importance of creating dashboards and learn to build a simple Tableau dashboard.
+- There are many tools to create dashboards, but Tableau is one of the most popular because of it is available in several OS and has a user-friendly interface.
 
 &lt;div align="center"&gt;
-&lt;img src="https://ml-ops.org/img/mlops-loop-en.jpg" width="40%"&gt;
+&lt;img src="https://www.tableau.com/sites/default/files/2022-05/Products_Desktop_Intro.png" width="50%"&gt;
 &lt;/div&gt;
 
 ---
-# The origin of MLOps
+# What is the Purpose of a Dashboard?
 
-- The origin comes from DevOps
-- DevOps is a set of practices that combines software development (Dev) and IT operations (Ops)
-- The goal is to shorten the systems development life cycle and provide continuous delivery with high software quality
-
-&lt;div align="center"&gt;
-&lt;img src="https://miro.medium.com/v2/resize:fit:1400/0*Iepz1OLoJ_ppCbm6.png" width="50%"&gt;
-&lt;/div&gt;
-
-
----
-# Why MLOps?
-
-&lt;div align="center"&gt;
-&lt;img src="https://cdn.prod.website-files.com/618399cd49d125734c8dec95/66a3437f014c1e1ac78d4de9_6502ad4eb9b805fbe60281f4_figure%25203_lightbox.png" width="90%"&gt;
-&lt;/div&gt;
-
----
-
-# Deployment Gap
-- The deployment gap is the difference between the number of models that are built and the number of models that are deployed.
-- More and more enterprises are experimenting with ML. Getting a model into the real world involves more than just building it.
-- In order to take full advantage of the built ML model by making it available to our core software system, we would need to incorporate the trained ML model into the core codebase. 
-  - That means, we need to deploy the ML model into production. 
-
-
-
----
-# Deployment Gap
-
-&lt;div align="center"&gt;
-&lt;img src="https://ml-ops.org/img/ML-deployment_Gap.jpg" width="70%"&gt;
-&lt;/div&gt;
-
- MLOps allows us to:
- - Improve collaboration
- - Automation of deployment
- - Monitoring and maintenance
----
-
-class: center, middle
-
-# Different phases in MLOps
-
-&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=1100px&gt;&lt;/html&gt;
-
----
-# MLOps Lifecycle
-
-&lt;div align="center"&gt;
-&lt;img src="https://cdn.prod.website-files.com/6108e07db6795265f203a636/61f39b423ef33a6ccfad9663_MLOps.png"  width="70%"&gt;
-&lt;/div&gt;
-
-
----
-
-# Design phase
-
-- Context of the problem
-- Added value
-- Business requirements
-- Key metrics
-- Data sources
-
-
-
----
-# Development phase
-
-- Develop machine learning models
-- Experiment with data, algorithms, and hyperparameters
-- Model ready for deployment
-
----
-# Deployment phase
-
-- Integrate the machine learning models in business
-- Deploy the model in production
-- Monitor the model performance
-
----
-class: center, middle
-
-&lt;img src="pics/ml_production_meme.jpeg" width="32%"&gt;
-
----
-
-class: center, middle
-
-# Development phase: Experiment Tracking
-
-&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=1100px&gt;&lt;/html&gt;
----
-# Important Concepts
-
-- ML experiment: the process of building an ML model
-- Experiment run: each trial in an ML experiment
-- Run artifact: any file that is associated with an ML run
-- Experiment metadata: information about an ML experiment like the source
-code used, the name of the user, etc.
-
----
-# What’s experiment tracking?
-
-
-
-Experiment tracking is the process of keeping track of all the relevant information
-from an ML experiment, which includes:
-- Source code
-- Environment
-- Data
-- Model
-- Hyperparameters
-- Metrics
-- ...
-
----
-# Why is experiment tracking so important?
 .pull-left[
-In general, because of these 3 main reasons:
-- Reproducibility
-- Organization
-- Optimization
+- **Car Dashboard Analogy**  
+  - Provides real-time information (e.g., speed, fuel, RPM).  
+  - Helps drivers monitor and respond quickly.  
+- **Data Dashboard**  
+  - Displays key metrics (e.g., sales, KPIs, customer feedback).  
+  - Summarizes business events into real-time visualizations.  
+  - Enables fast and effective decision-making.  
 ]
 
 .pull-right[
 &lt;div align="center"&gt;
-&lt;img src="https://cdn.prod.website-files.com/64d39f3feec1e3615e150507/64d94dcd18778b93a9286d9c_647ef9479c37a63f953acd7c_Experiment_Tracker_Experiment_Components.png"  width="150%"&gt;
+&lt;img src="pics/car-dashboard.png" width="70%"&gt;
 &lt;/div&gt;
 ]
 
 ---
-# Manual Tracking
+# Benefits of Dashboard reporting
+.pull-left[
+- **Usability**  
+  - Simplifies raw data into valuable insights.  
+  - Access to key metrics on a single screen.  
+- **Access to Data**  
+  - Integrates multiple data sources for detailed reporting.  
+- **Decision Making**  
+  - Detect anomalies, forecast sales, and review historical data.  
+  - Interactive visuals allow deeper exploration and filtering. 
+]
+
+.pull-right[
+- **Accountability**  
+  - Provides an unbiased view of company performance.  
+  - Highlights growth differences and marketing campaign outcomes.  
+- **Interactivity**  
+  - Gamified and dynamic experience for ease of use.  
+  - Features include filtering, zooming, and anomaly alarms.  
+- **Analysis**  
+  - Enables detailed analytical reports.  
+]
+
+---
+
+# Types of Dashboards
+
+- **Operational Dashboards**  
+  - Monitor real-time performance of daily operations.  
+  - Connected to multiple data sources with numerous metrics. 
+--
+
+- **Analytical Dashboards**  
+  - Use historical data to identify trends.  
+  - Aid in detailed reporting and system improvement.  
+  
+--
+
+- **Strategic Dashboards**  
+  - Track performance against key performance indicators (KPIs).  
+  - Align actions with strategic goals.  
+
+---
+# Use Cases of Dashboards
 
 .pull-left[
-This involves using spreadsheets to manually log experiment details.
-- you’ll use systematic naming conventions to organize files and experiments in directories.
-- This method is easy to implement, but it falls apart at scale. 
-- Not only is there a risk of logging incorrect information, but also overwriting others’ work.
+- **In Data Science**  
+  - Machine learning operations  
+  - Data streaming and database management  
+
+- **In Business**  
+  - Customer metrics  
+  - Financial and sales information 
+  - Human resources data  
+  - Marketing performance  
 ]
 
 .pull-right[
 &lt;div align="center"&gt;
-&lt;img src="https://viso.ai/wp-content/uploads/2024/01/manual-dc-1060x491.jpg"  width="100%"&gt;
+&lt;img src="https://media.datacamp.com/legacy/v1724339564/image_1e5ef5fde3.png" width="80%"&gt;
 &lt;/div&gt;
-]
----
-# Using Moderns Experiment Tracking Tools
-.pull-left[
-There are specialized software solutions designed to systematically record, organize, and compare data from machine learning experiments.
-Built for ML models, they excel at:
-- tracking hyperparameters, 
-- evaluation metrics, 
-- model weights, and 
-- outputs. 
 
-Their functionalities are well-suited to typical ML tasks.
 ]
 
-.pull-right[
-Common experiment tracking tools include:
-- MLFlow
-- CometML
-- Neptune
-- TensorBoard
-- Weights &amp; Biases
-]
 ---
+# How to Create a Data Dashboard
+- **Understand Your Audience**  
+  - Identify their needs and goals.  
+- **Choose Relevant Data**  
+  - Ensure the data is clean and accurate.  
+- **Select Effective Visualizations**  
+  - Pick visualizations that best represent the data.  
+- **Use Templates for Simplicity**  
+  - Start with templates to reduce complexity.  
+- **Design with Clarity**  
+  - Avoid clutter and use simple colors.  
+  - Highlight the most significant insights.  
+- **Iterate and Improve**  
+  - Collect audience feedback and refine the design.
+
+---
+
 class: center, middle
 
-# Weights and Biases demo
+# Demo in Tableau  
 
 &lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=1100px&gt;&lt;/html&gt;
----
 
-# Demo
+---
+# Primary Components of Tableau
 
 &lt;div align="center"&gt;
-&lt;img src="https://camo.githubusercontent.com/f07f4090c88e640c9cd712588ebc2f001e8dddd9b6acb1cd15bb4018f101cc64/68747470733a2f2f692e696d6775722e636f6d2f5455333451465a2e706e67" width="70%"&gt;
+&lt;img src="https://media.datacamp.com/legacy/v1724339565/image_ef4b4a36cd.png" width=80%&gt;
 &lt;/div&gt;
+
+
+---
+
+# Data Visualization Sheets
+
+&lt;div align="center"&gt;
+&lt;img src="https://media.datacamp.com/legacy/v1724339565/image_897ee66048.png" width=50%&gt;
+&lt;/div&gt;
+
+
+---
+# Bottom Panel: Multiple Worksheets
+&lt;div align="center"&gt;
+&lt;img src="https://media.datacamp.com/legacy/v1724339564/image_7a84ef0a41.png" width=80%&gt;
+&lt;/div&gt;
+
+---
+# Bulding Dashboards
+
+.pull-left[
+- **Canvas**  
+  - To set the size of the dashboard based on various devices  
+- **Sheets**  
+  - For adding and removing worksheets on canvas
+- **Objects**  
+  - For adding text, images, and web pages to the dashboard  
+]
+
+.pull-right[
+&lt;div align="center"&gt;
+&lt;img src="https://media.datacamp.com/legacy/v1724339565/image_10cf9f9647.png" width=50%&gt;
+&lt;/div&gt;
+]
+
+
 ---
 
 class: center, middle, thank-you-slide
@@ -270,10 +236,10 @@ class: center, middle, thank-you-slide
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
-  "highlightStyle": "github",
-  "highlightLines": true,
-  "countIncrementalSlides": false,
-  "ratio": "16:9"
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
